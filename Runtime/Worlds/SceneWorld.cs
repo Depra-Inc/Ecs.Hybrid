@@ -1,4 +1,7 @@
-﻿using Depra.Ecs.Worlds;
+﻿// SPDX-License-Identifier: Apache-2.0
+// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+
+using Depra.Ecs.Worlds;
 
 namespace Depra.Ecs.Baking.Runtime.Worlds
 {

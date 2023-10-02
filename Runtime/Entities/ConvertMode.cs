@@ -1,4 +1,7 @@
-﻿namespace Depra.Ecs.Baking.Runtime.Entities
+﻿// SPDX-License-Identifier: Apache-2.0
+// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+
+namespace Depra.Ecs.Baking.Runtime.Entities
 {
 	internal enum ConvertMode
 	{

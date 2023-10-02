@@ -1,4 +1,7 @@
-﻿using Depra.Ecs.Baking.Runtime.Entities;
+﻿// SPDX-License-Identifier: Apache-2.0
+// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+
+using Depra.Ecs.Baking.Runtime.Entities;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 
