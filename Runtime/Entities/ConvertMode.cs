@@ -7,13 +7,13 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 {
 	internal enum ConvertMode
 	{
-		[InspectorName("Convert and inject into world")]
+		[InspectorName("Convert and Inject")]
 		CONVERT_AND_INJECT,
 
-		[InspectorName("Convert and destroy")]
+		[InspectorName("Convert and Destroy")]
 		CONVERT_AND_DESTROY,
 
-		[InspectorName("Convert and save")]
+		[InspectorName("Convert and Save")]
 		CONVERT_AND_SAVE
 	}
 }
