@@ -28,7 +28,7 @@
 
 This repository is extension to [Depra.Ecs](https://github.com/Depra-Inc/Ecs) -
 Engine independent ECS that works with any Game Engine.
-But Unity Engineers often ask how to integrate Leo with Unity Inspector and deal with Prefabs.
+But Unity Engineers often ask how to integrate **Depra.Ecs** with **Unity Inspector** and deal with Prefabs.
 This lightweight repository is intended to help with this.
 
 ### 💡 Features
@@ -163,8 +163,7 @@ Please, add `ConvertScene` method **after** UnityEditor extension
 
 ## 🖇 Dependencies
 
-- [Depra.Ecs](https://github.com/Depra-Inc/Ecs.Unity.git) - the base library for working with assets (provided
-  with this **UPM** package).
+- [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git) - the base ecs library.
 
 ## 🤝 Collaboration
 
