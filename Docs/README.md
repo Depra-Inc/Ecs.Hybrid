@@ -10,8 +10,13 @@
 - [Introduction](#-introduction)
     - [Features](#-features)
 - [Installation](#-installation)
-- [Contents](#-contents)
 - [Usage Examples](#-usage-examples)
+    - [Create Your component](#create-your-component)
+    - [Create a new ComponentBaker](#create-a-new-componentbaker)
+    - [Choose conversion mode](#choose-conversion-mode)
+    - [Convert Your GameObjects to Entity](#convert-your-gameobjects-to-entity)
+    - [Spawn Prefabs](#spawn-prefabs)
+    - [Working with Unity Editor Extension](#working-with-unity-editor-extension)
 - [Dependencies](#-dependencies)
 - [Collaboration](#-collaboration)
 - [Support](#-support)
@@ -21,49 +26,46 @@
 
 ## 🧾 Introduction
 
-Important! This repository is extension to [Depra.Ecs](https://github.com/Depra-Inc/Ecs) -
+This repository is extension to [Depra.Ecs](https://github.com/Depra-Inc/Ecs) -
 Engine independent ECS that works with any Game Engine.
 But Unity Engineers often ask how to integrate Leo with Unity Inspector and deal with Prefabs.
 This lightweight repository is intended to help with this.
 
+### 💡 Features
+
+- **Open Source**: This library is open source and free to use.
+- **Easy to use**: Just add `ComponentBaker` to your component and add `ConvertScene` method to your `WorldSystems`.
+- **Convert Modes**: You can choose how to convert **GameObjects to **Entity**.
+- **Prefab support**: You can spawn Prefabs with `ComponentBaker` and it will be converted to **Entity** after spawn.
+- **Extensibility**: A flexible architecture for extending functionality according to your needs.
+- **Entities-like**: This library is similar to **Entities** conversion workflow.
+- **Lightweight**: This library is lightweight and has single dependency.
+- **Declarative**: You can control your component values within the **Unity Inspector**.
+
 ## 📥 Installation
 
-**First** you need to install [Depra.Ecs](https://github.com/Depra-Inc/Ecs),
-you can do it with Unity Package Manager
-
-Add new line to `Packages/manifest.json`
-
-```
-"com.leopotam.ecslite": "https://github.com/voody2506/ecslite.git",
-```
-
-**Second** install this repository
-
-```
-"com.voody.unileo.lite": "https://github.com/voody2506/UniLeo-Lite.git",
-```
+First of all you need to install [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git). 
+Just add .dll to your project.
 
 ### 📦 Using **UPM**:
 
 1. Open the **Unity Package Manager** window.
 2. Click the **+** button in the upper right corner of the window.
 3. Select **Add package from git URL...**.
-4. Enter the base [repository link](https://github.com/Depra-Inc/Ecs.Unity.git).
+4. Enter the [repository link](https://github.com/Depra-Inc/Ecs.Baking.git).
 5. Click **Add**.
-6. Repeat steps 2-5 for this [repository](https://github.com/Depra-Inc/Ecs.Baking.git).
 
 ### ⚙️ Manual:
 
-Add the following lines to `Packages/manifest.json` in the `dependencies` section:
+Add the following line to `Packages/manifest.json` in the `dependencies` section:
 
 ```
-"com.depra.ecs": "https://github.com/Depra-Inc/Ecs.Unity.git"
 "com.depra.ecs.baking": "https://github.com/Depra-Inc/Ecs.Baking.git"
 ```
 
 ## 📋 Usage Examples
 
-### Create your component
+### Create Your component
 
 ```csharp
 [Serializable] // <- Important to add Serializable attribute
@@ -77,7 +79,7 @@ Now you need to control health value within the **Unity Inspector**,
 but **Unity Engine** works only with `MonoBehaviour` classes.
 That mean you need to create **Baker** for our component.
 
-Create new script with `ComponentBaker`.
+### Create a new ComponentBaker.
 
 ```csharp
 public sealed class HealthComponentBaker : ComponentBaker<HealthComponent> { }
@@ -85,7 +87,7 @@ public sealed class HealthComponentBaker : ComponentBaker<HealthComponent> { }
 
 Add `HealthComponentBaker` into **Inspector**
 <details>
-  <summary>Inspector Preview</summary>
+  <summary>Inspector preview</summary>
 
 ![Health Component Baker](https://i.postimg.cc/RVNG1K36/health-component.jpg)
 </details>
@@ -94,10 +96,13 @@ Now you can control component values within the **Inspector**. Congratulations!
 
 > ⚠️ At this moment you can not control values from **Inspector** at **Runtime**
 
+### Choose conversion mode
+
 <details>
-  <summary>Choose conversion mode</summary>
+  <summary>Inspector preview</summary>
 
 ![Convert Mode](https://i.postimg.cc/J04qyBXq/convert-method.jpg)
+</details>
 
 | Mode                | Description                                                   |
 |---------------------|---------------------------------------------------------------|
@@ -105,19 +110,18 @@ Now you can control component values within the **Inspector**. Congratulations!
 | Convert And Destroy | Deletes GameObject after conversion                           |
 | Convert And Save    | Stores associated GameObject entity in ConvertToEntity Script |
 
+You can also retrieve a value from **ConvertibleEntity**:
+
 ```csharp
-// Than just get value from ConvertToEntity MonoBehavior
 if (ConvertToEntity.TryGetEntity().HasValue) {
     ConvertToEntity.TryGetEntity().Value
 }
 ```
 
-</details>
+### Convert Your GameObjects to Entity
 
-### Convert your GameObjects to Entity
-
-You cant create `MonoBehaviour` for Startup ECS. 
-To Automatically convert **GameObjects** to **Entity** add `ConvertScene()` method.
+You cant create `MonoBehaviour` for startup ECS.
+To Automatically convert **GameObjects** to **Entity** add `WorldSystemsExtensions.ConvertScene()` method.
 
 ```csharp
 void Start() 
@@ -128,12 +132,12 @@ void Start()
         .ConvertScene() // <- Need to add this method
         .Add(new ExampleSystem());
     
-    _systems.Initilize();
+    _systems.Initialize();
  }
 ```
 
-**ConvertScene** - method that automatically scan world, 
-finds GameObjects with `ComponentBaker`, 
+**ConvertScene** - method that automatically scan world,
+finds GameObjects with `ComponentBaker`,
 creates entity and adds initial Components to the Entity.
 
 ### Spawn Prefabs
@@ -165,8 +169,8 @@ Please, add `ConvertScene` method **after** UnityEditor extension
 ## 🤝 Collaboration
 
 I welcome feature requests and bug reports in
-the [issues section](https://github.com/Depra-Inc/Ecs.Unity/issues), and I also
-accept [pull requests](https://github.com/Depra-Inc/Ecs.Unity/pulls).
+the [issues section](https://github.com/Depra-Inc/Ecs.Baking/issues), and I also
+accept [pull requests](https://github.com/Depra-Inc/Ecs.Baking/pulls).
 
 ## 🫂 Support
 
@@ -177,7 +181,7 @@ my [portfolio](https://github.com/Depra-Inc) and [contact me](mailto:g0dzZz1lla@
 ## 🔐 License
 
 This project is distributed under the
-**[Apache-2.0 license](https://github.com/Depra-Inc/Ecs.Unity/blob/main/LICENSE.md)**
+**[Apache-2.0 license](https://github.com/Depra-Inc/Ecs.Baking/blob/main/LICENSE.md)**
 
 Copyright (c) 2023 Nikolay Melnikov
 [n.melnikov@depra.org](mailto:n.melnikov@depra.org)
