@@ -3,7 +3,7 @@
 
 using Depra.Ecs.Worlds;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Internal
 {
 	internal static class SceneWorld
 	{

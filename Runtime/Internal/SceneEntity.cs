@@ -9,7 +9,7 @@ using Depra.Ecs.Worlds;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Internal
 {
 #if ENABLE_IL2CPP
 	using Unity.IL2CPP.CompilerServices;

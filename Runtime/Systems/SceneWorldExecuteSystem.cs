@@ -1,11 +1,12 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
+using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Filters;
 using Depra.Ecs.Pools;
 using Depra.Ecs.Systems;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Systems
 {
 #if ENABLE_IL2CPP
 	using Unity.IL2CPP.CompilerServices;

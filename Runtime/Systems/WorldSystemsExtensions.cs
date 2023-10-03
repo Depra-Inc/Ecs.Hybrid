@@ -4,7 +4,7 @@
 using System.Runtime.CompilerServices;
 using Depra.Ecs.Systems;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Systems
 {
 	public static class WorldSystemsExtensions
 	{

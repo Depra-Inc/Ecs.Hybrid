@@ -4,10 +4,10 @@
 using System;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Internal
 {
 	[Serializable]
-	public struct ConvertibleGameObject
+	internal struct ConvertibleGameObject
 	{
 		public GameObject Value;
 	}

@@ -2,10 +2,11 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Baking.Runtime.Entities;
+using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Systems;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Runtime.Worlds
+namespace Depra.Ecs.Baking.Runtime.Systems
 {
 	public readonly struct SceneWorldInitializeSystem : IPreInitializeSystem
 	{
