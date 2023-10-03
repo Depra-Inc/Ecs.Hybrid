@@ -32,22 +32,22 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 			var entity = world.CreateEntity();
 			var packedEntity = new PackedEntityWithWorld(entity, world, world.GetEntityGeneration(entity));
 
-			foreach (var backer in convertible.GetComponents<ComponentBaker>())
+			foreach (var baker in convertible.GetComponents<ComponentBaker>())
 			{
-				backer.Bake(entity, world);
-				Object.Destroy(backer);
+				baker.Bake(entity, world);
+				Object.Destroy(baker);
 			}
 
 			convertible.MarkAsProcessed();
 			FinalizeConversion(convertible, convertible, packedEntity);
 		}
 
-		private static void FinalizeConversion(Object @object, ConvertibleEntity convertible, PackedEntityWithWorld entity)
+		private static void FinalizeConversion(Object root, ConvertibleEntity convertible, PackedEntityWithWorld entity)
 		{
 			switch (convertible._mode)
 			{
 				case ConvertMode.CONVERT_AND_DESTROY:
-					Object.Destroy(@object);
+					Object.Destroy(root);
 					break;
 				case ConvertMode.CONVERT_AND_INJECT:
 					Object.Destroy(convertible);
