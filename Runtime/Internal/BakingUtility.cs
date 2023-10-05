@@ -24,10 +24,10 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 			var entity = world.CreateEntity();
 			var packedEntity = world.PackEntityWithWorld(entity);
 
-			foreach (var authoringComponent in authoringEntity.GetComponents<IAuthoring>())
+			foreach (var authoring in authoringEntity.GetComponents<IAuthoring>())
 			{
-				authoringComponent.CreateBaker(packedEntity).Bake(authoringComponent);
-				Object.Destroy((Component) authoringComponent);
+				authoring.CreateBaker(packedEntity).Bake(authoring);
+				Object.Destroy((Component) authoring);
 			}
 
 			authoringEntity.MarkAsProcessed();

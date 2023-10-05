@@ -34,9 +34,9 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 			foreach (int entity in _entities)
 			{
 				ref var convertible = ref _convertibles[entity];
-				if (convertible.Value && convertible.Value.TryGetComponent(out AuthoringEntity authoringEntity))
+				if (convertible.Value && convertible.Value.TryGetComponent(out AuthoringEntity authoring))
 				{
-					BakingUtility.Bake(authoringEntity, _convertibles.World);
+					BakingUtility.Bake(authoring, _convertibles.World);
 				}
 
 				_world.DeleteEntity(entity);
