@@ -17,7 +17,7 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 		private World _spawnWorld;
 		private PackedEntityWithWorld _entity;
 
-		private void Start()
+		private void OnEnable()
 		{
 			var world = BakingWorld.World;
 			if (world == null || _processed)
@@ -26,8 +26,8 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 			}
 
 			var entity = world.CreateEntity();
-			ref var componentReference = ref world.Pool<ConvertibleGameObject>().Allocate(entity);
-			componentReference.Value = gameObject;
+			ref var convertibleEntity = ref world.Pool<ConvertibleEntityRef>().Allocate(entity);
+			convertibleEntity.Value = gameObject;
 		}
 
 		public int? TryGetEntity() => _entity.Unpack(out _, out var entity) ? entity : null;

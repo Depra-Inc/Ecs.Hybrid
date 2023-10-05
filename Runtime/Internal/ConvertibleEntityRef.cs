@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Depra.Ecs.Baking.Runtime.Internal
 {
 	[Serializable]
-	internal struct ConvertibleGameObject
+	internal struct ConvertibleEntityRef
 	{
 		public GameObject Value;
 	}

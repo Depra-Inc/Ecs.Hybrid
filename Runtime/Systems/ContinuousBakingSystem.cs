@@ -19,13 +19,13 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	{
 		private World _world;
 		private EntityFilter _entities;
-		private ComponentPool<ConvertibleGameObject> _convertibles;
+		private ComponentPool<ConvertibleEntityRef> _convertibles;
 
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
 			_world = systems.World;
-			_entities = _world.Filter<ConvertibleGameObject>().End();
-			_convertibles = _world.Pool<ConvertibleGameObject>();
+			_entities = _world.Filter<ConvertibleEntityRef>().End();
+			_convertibles = _world.Pool<ConvertibleEntityRef>();
 		}
 
 		void IExecuteSystem.Execute(float frameTime)
@@ -36,7 +36,7 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 
 				if (convertible.Value)
 				{
-					SceneEntity.TryConvert(convertible.Value, _convertibles.World);
+					BakingUtility.TryBake(convertible.Value, _convertibles.World);
 				}
 
 				_world.DeleteEntity(entity);

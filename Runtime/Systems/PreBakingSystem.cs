@@ -9,9 +9,9 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	{
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
-			foreach (var convertible in Object.FindObjectsOfType<AuthoringEntity>())
+			foreach (var authoringEntity in Object.FindObjectsOfType<AuthoringEntity>())
 			{
-				SceneEntity.TryConvert(convertible.gameObject, systems.World);
+				BakingUtility.TryBake(authoringEntity.gameObject, systems.World);
 			}
 		}
 	}

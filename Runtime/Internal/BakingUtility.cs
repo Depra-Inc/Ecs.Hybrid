@@ -17,43 +17,44 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	internal static class SceneEntity
+	internal static class BakingUtility
 	{
-		public static void TryConvert(GameObject root, World world)
+		public static void TryBake(GameObject root, World world)
 		{
-			if (root.TryGetComponent(out AuthoringEntity convertible))
+			if (root.TryGetComponent(out AuthoringEntity authoringEntity))
 			{
-				Convert(convertible, world);
+				Bake(authoringEntity, world);
 			}
 		}
 
-		private static void Convert(AuthoringEntity convertible, World world)
+		private static void Bake(AuthoringEntity authoringEntity, World world)
 		{
 			var entity = world.CreateEntity();
 			var packedEntity = new PackedEntityWithWorld(entity, world, world.GetEntityGeneration(entity));
 
-			foreach (var authoring in convertible.GetComponents<AuthoringComponent>())
+			foreach (var authoringComponent in authoringEntity.GetComponents<AuthoringComponent>())
 			{
-				authoring.CreateBaker(packedEntity).Bake(authoring);
-				Object.Destroy(authoring);
+				authoringComponent.CreateBaker(packedEntity).Bake(authoringComponent);
+				Object.Destroy(authoringComponent);
 			}
 
-			convertible.MarkAsProcessed();
-			FinalizeConversion(convertible.gameObject, convertible, packedEntity);
+			authoringEntity.MarkAsProcessed();
+			FinalizeConversion(authoringEntity.gameObject, authoringEntity, packedEntity);
 		}
 
-		private static void FinalizeConversion(Object root, AuthoringEntity convertible, PackedEntityWithWorld entity)
+		private static void FinalizeConversion(Object root, AuthoringEntity authoringEntity,
+			PackedEntityWithWorld entity)
 		{
-			switch (convertible._mode)
+			switch (authoringEntity._mode)
 			{
 				case ConversionMode.CONVERT_AND_DESTROY:
 					Object.Destroy(root);
 					break;
 				case ConversionMode.CONVERT_AND_INJECT:
-					Object.Destroy(convertible);
+					Object.Destroy(authoringEntity);
 					break;
 				case ConversionMode.CONVERT_AND_SAVE:
-					convertible.Initialize(entity);
+					authoringEntity.Initialize(entity);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
