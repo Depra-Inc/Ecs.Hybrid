@@ -24,23 +24,22 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 			var entity = world.CreateEntity();
 			var packedEntity = world.PackEntityWithWorld(entity);
 
-			foreach (var authoringComponent in authoringEntity.GetComponents<AuthoringComponent>())
+			foreach (var authoringComponent in authoringEntity.GetComponents<IAuthoring>())
 			{
 				authoringComponent.CreateBaker(packedEntity).Bake(authoringComponent);
-				Object.Destroy(authoringComponent);
+				Object.Destroy((Component) authoringComponent);
 			}
 
 			authoringEntity.MarkAsProcessed();
-			FinalizeConversion(authoringEntity.gameObject, authoringEntity, packedEntity);
+			FinalizeConversion(authoringEntity, packedEntity);
 		}
 
-		private static void FinalizeConversion(Object root, AuthoringEntity authoringEntity,
-			PackedEntityWithWorld entity)
+		private static void FinalizeConversion(AuthoringEntity authoringEntity, PackedEntityWithWorld entity)
 		{
 			switch (authoringEntity._mode)
 			{
 				case ConversionMode.CONVERT_AND_DESTROY:
-					Object.Destroy(root);
+					Object.Destroy(authoringEntity.gameObject);
 					break;
 				case ConversionMode.CONVERT_AND_INJECT:
 					Object.Destroy(authoringEntity);

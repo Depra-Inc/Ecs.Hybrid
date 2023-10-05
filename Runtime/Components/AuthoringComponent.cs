@@ -1,7 +1,6 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using System;
 using Depra.Ecs.Baking.Runtime.Entities;
 using Depra.Ecs.Entities;
 using UnityEngine;
@@ -9,12 +8,12 @@ using UnityEngine;
 namespace Depra.Ecs.Baking.Runtime.Components
 {
 	[RequireComponent(typeof(AuthoringEntity))]
-	public abstract class AuthoringComponent : MonoBehaviour
+	public abstract class AuthoringComponent<TComponent> : MonoBehaviour, IAuthoring where TComponent : struct
 	{
-		internal abstract object Data { get; }
+		[SerializeField] private TComponent _value;
 
-		internal abstract Type ComponentType { get; }
+		protected TComponent Value => _value;
 
-		public abstract IComponentBaker CreateBaker(PackedEntityWithWorld entity);
+		public abstract IBaker CreateBaker(PackedEntityWithWorld entity);
 	}
 }

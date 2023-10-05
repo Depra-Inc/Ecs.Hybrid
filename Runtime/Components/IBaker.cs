@@ -3,8 +3,8 @@
 
 namespace Depra.Ecs.Baking.Runtime.Components
 {
-	public interface IComponentBaker
+	public interface IBaker
 	{
-		void Bake(AuthoringComponent authoring);
+		void Bake(IAuthoring authoring);
 	}
 }

@@ -3,7 +3,6 @@
 
 using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Entities;
-using Depra.Ecs.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Runtime.Entities
@@ -14,20 +13,15 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 		[SerializeField] internal ConversionMode _mode;
 
 		private bool _processed;
-		private World _spawnWorld;
 		private PackedEntityWithWorld _entity;
 
 		private void OnEnable()
 		{
 			var world = BakingWorld.World;
-			if (world == null || _processed)
+			if (world != null && _processed == false)
 			{
-				return;
+				world.Pool<ConvertibleEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 			}
-
-			var entity = world.CreateEntity();
-			ref var convertibleEntity = ref world.Pool<ConvertibleEntityRef>().Allocate(entity);
-			convertibleEntity.Value = gameObject;
 		}
 
 		public int? TryGetEntity() => _entity.Unpack(out _, out var entity) ? entity : null;
