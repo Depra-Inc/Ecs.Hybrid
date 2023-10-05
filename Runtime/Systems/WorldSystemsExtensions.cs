@@ -10,8 +10,9 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static IWorldSystems ConvertScene<TSystems>(this TSystems self) where TSystems : IWorldSystems => self
-			.Add(new SceneWorldInitializeSystem())
-			.Add(new SceneWorldExecuteSystem())
-			.Add(new SceneWorldTearDownSystem());
+			.Add(new BakingInitializationSystem())
+			.Add(new PreBakingSystem())
+			.Add(new ContinuousBakingSystem())
+			.Add(new BakingFinalizationSystem());
 	}
 }

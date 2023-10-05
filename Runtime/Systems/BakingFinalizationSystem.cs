@@ -6,8 +6,8 @@ using Depra.Ecs.Systems;
 
 namespace Depra.Ecs.Baking.Runtime.Systems
 {
-	public readonly struct SceneWorldTearDownSystem : ITearDownSystem
+	public readonly struct BakingFinalizationSystem : ITearDownSystem
 	{
-		void ITearDownSystem.TearDown(IWorldSystems systems) => SceneWorld.Destroy();
+		void ITearDownSystem.TearDown(IWorldSystems systems) => BakingWorld.Destroy();
 	}
 }

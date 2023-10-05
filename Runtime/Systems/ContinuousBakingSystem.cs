@@ -2,9 +2,10 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Baking.Runtime.Internal;
+using Depra.Ecs.Components;
 using Depra.Ecs.Filters;
-using Depra.Ecs.Pools;
 using Depra.Ecs.Systems;
+using Depra.Ecs.Worlds;
 
 namespace Depra.Ecs.Baking.Runtime.Systems
 {
@@ -14,16 +15,17 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	public sealed class SceneWorldExecuteSystem : IPreInitializeSystem, IExecuteSystem
+	public sealed class ContinuousBakingSystem : IPreInitializeSystem, IExecuteSystem
 	{
+		private World _world;
 		private EntityFilter _entities;
 		private ComponentPool<ConvertibleGameObject> _convertibles;
 
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
-			var world = systems.World;
-			_entities = world.Filter<ConvertibleGameObject>().End();
-			_convertibles = world.Pool<ConvertibleGameObject>();
+			_world = systems.World;
+			_entities = _world.Filter<ConvertibleGameObject>().End();
+			_convertibles = _world.Pool<ConvertibleGameObject>();
 		}
 
 		void IExecuteSystem.Execute(float frameTime)
@@ -37,7 +39,7 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 					SceneEntity.TryConvert(convertible.Value, _convertibles.World);
 				}
 
-				_convertibles.Delete(entity);
+				_world.DeleteEntity(entity);
 			}
 		}
 	}

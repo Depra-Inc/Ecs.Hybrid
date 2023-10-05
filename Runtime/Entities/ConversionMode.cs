@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Depra.Ecs.Baking.Runtime.Entities
 {
-	internal enum ConvertMode
+	internal enum ConversionMode
 	{
 		[InspectorName("Convert and Inject")]
 		CONVERT_AND_INJECT,

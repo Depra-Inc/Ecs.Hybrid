@@ -3,16 +3,15 @@
 
 using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Entities;
-using Depra.Ecs.Extensions;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Runtime.Entities
 {
 	[DisallowMultipleComponent]
-	public sealed class ConvertibleEntity : MonoBehaviour
+	public sealed class AuthoringEntity : MonoBehaviour
 	{
-		[SerializeField] internal ConvertMode _mode;
+		[SerializeField] internal ConversionMode _mode;
 
 		private bool _processed;
 		private World _spawnWorld;
@@ -20,7 +19,7 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 
 		private void Start()
 		{
-			var world = SceneWorld.World;
+			var world = BakingWorld.World;
 			if (world == null || _processed)
 			{
 				return;

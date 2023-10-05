@@ -21,38 +21,38 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 	{
 		public static void TryConvert(GameObject root, World world)
 		{
-			if (root.TryGetComponent(out ConvertibleEntity convertible))
+			if (root.TryGetComponent(out AuthoringEntity convertible))
 			{
 				Convert(convertible, world);
 			}
 		}
 
-		private static void Convert(ConvertibleEntity convertible, World world)
+		private static void Convert(AuthoringEntity convertible, World world)
 		{
 			var entity = world.CreateEntity();
 			var packedEntity = new PackedEntityWithWorld(entity, world, world.GetEntityGeneration(entity));
 
-			foreach (var baker in convertible.GetComponents<ComponentBaker>())
+			foreach (var authoring in convertible.GetComponents<AuthoringComponent>())
 			{
-				baker.Bake(entity, world);
-				Object.Destroy(baker);
+				authoring.CreateBaker(packedEntity).Bake(authoring);
+				Object.Destroy(authoring);
 			}
 
 			convertible.MarkAsProcessed();
-			FinalizeConversion(convertible, convertible, packedEntity);
+			FinalizeConversion(convertible.gameObject, convertible, packedEntity);
 		}
 
-		private static void FinalizeConversion(Object root, ConvertibleEntity convertible, PackedEntityWithWorld entity)
+		private static void FinalizeConversion(Object root, AuthoringEntity convertible, PackedEntityWithWorld entity)
 		{
 			switch (convertible._mode)
 			{
-				case ConvertMode.CONVERT_AND_DESTROY:
+				case ConversionMode.CONVERT_AND_DESTROY:
 					Object.Destroy(root);
 					break;
-				case ConvertMode.CONVERT_AND_INJECT:
+				case ConversionMode.CONVERT_AND_INJECT:
 					Object.Destroy(convertible);
 					break;
-				case ConvertMode.CONVERT_AND_SAVE:
+				case ConversionMode.CONVERT_AND_SAVE:
 					convertible.Initialize(entity);
 					break;
 				default:

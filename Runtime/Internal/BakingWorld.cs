@@ -5,7 +5,7 @@ using Depra.Ecs.Worlds;
 
 namespace Depra.Ecs.Baking.Runtime.Internal
 {
-	internal static class SceneWorld
+	internal static class BakingWorld
 	{
 		public static World World;
 

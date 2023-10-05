@@ -1,24 +1,14 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Runtime.Components
 {
-	public abstract class ComponentBaker<TComponent> : ComponentBaker where TComponent : struct
+	public abstract class ComponentBaker<TAuthoring> : IComponentBaker where TAuthoring : Component
 	{
-		[SerializeField] private TComponent _value;
+		public abstract void Bake(TAuthoring authoring);
 
-		internal override void Bake(int entity, World world)
-		{
-			var pool = world.Pool<TComponent>();
-			if (pool.Has(entity))
-			{
-				pool.Delete(entity);
-			}
-
-			pool.Allocate(entity) = _value;
-		}
+		public void Bake(AuthoringComponent authoring) => Bake(authoring as TAuthoring);
 	}
 }
