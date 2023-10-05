@@ -5,7 +5,7 @@
 ![Code Size](https://img.shields.io/github/languages/code-size/Depra-Inc/Ecs.Baking)
 
 <div>
-    <strong><a href="README.md">English</a> | <a href="README.RU.md">Русский</a></strong>
+    <strong><a href="README.md">English</a> | <a href="README.RU.md"></a></strong>
 </div>
 
 <details>
@@ -15,11 +15,11 @@
     - [Features](#-features)
 - [Installation](#-installation)
 - [Usage Examples](#-usage-examples)
-    - [Create Your component](#create-your-component)
-    - [Create a new ComponentBaker](#create-a-new-componentbaker)
-    - [Choose conversion mode](#choose-conversion-mode)
-    - [Convert Your GameObjects to Entity](#convert-your-gameobjects-to-entity)
-    - [Spawn Prefabs](#spawn-prefabs)
+    - [Create a custom component](#create-a-custom-component)
+    - [Create a new Authoring Component](#create-a-new-authoringcomponent)
+    - [Selecting conversion mode](#selecting-conversion-mode)
+    - [Converting Your GameObjects to Entity](#converting-your-gameobjects-to-entity)
+    - [Spawning Prefabs](#spawning-prefabs)
     - [Working with Unity Editor Extension](#working-with-unity-editor-extension)
 - [Dependencies](#-dependencies)
 - [Collaboration](#-collaboration)
@@ -30,26 +30,26 @@
 
 ## 🧾 Introduction
 
-This repository is extension to [Depra.Ecs](https://github.com/Depra-Inc/Ecs) -
-Engine independent ECS that works with any Game Engine.
-But Unity Engineers often ask how to integrate **Depra.Ecs** with **Unity Inspector** and deal with Prefabs.
-This lightweight repository is intended to help with this.
+This package extends the functionality of the [Depra.Ecs](https://github.com/Depra-Inc/Ecs) library
+with tools for configuring entities through the **Unity Inspector** in scenes and prefabs.
 
 ### 💡 Features
 
 - **Open Source**: This library is open source and free to use.
-- **Easy to use**: Just add `ComponentBaker` to your component and add `ConvertScene` method to your `WorldSystems`.
+- **Easy to use**: Simply add `AuthoringComponent` to your component and add `ConvertScene` method to
+  your `WorldSystems`.
 - **Convert Modes**: You can choose how to convert **GameObjects to **Entity**.
-- **Prefab support**: You can spawn Prefabs with `ComponentBaker` and it will be converted to **Entity** after spawn.
-- **Extensibility**: A flexible architecture for extending functionality according to your needs.
-- **Entities-like**: This library is similar to **Entities** conversion workflow.
+- **Prefab support**: You can spawn Prefabs with `AuthoringComponent`
+  and it will be converted to **Entity** after spawn.
+- **Extensibility**: Flexible architecture for extending functionality according to your needs.
+- **Entities-like**: This library is similar to **Unity.Entities** conversion workflow.
 - **Lightweight**: This library is lightweight and has single dependency.
 - **Declarative**: You can control your component values within the **Unity Inspector**.
 
 ## 📥 Installation
 
-First of all you need to install [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git). 
-Just add .dll to your project.
+First of all you need to install [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git).
+Simply add the ***.dll*** to your project.
 
 ### 📦 Using **UPM**:
 
@@ -69,11 +69,11 @@ Add the following line to `Packages/manifest.json` in the `dependencies` section
 
 ## 📋 Usage Examples
 
-### Create Your component
+### Create a custom component
 
 ```csharp
-[Serializable] // <- Important to add Serializable attribute
-public struct HealthComponent 
+[Serializable] // <- Important to add Serializable attribute!
+public struct Health
 {
     public float Value;
 }
@@ -81,99 +81,127 @@ public struct HealthComponent
 
 Now you need to control health value within the **Unity Inspector**,
 but **Unity Engine** works only with `MonoBehaviour` classes.
-That mean you need to create **Baker** for our component.
+That mean you need to create `AuthoringComponent` for our component.
 
-### Create a new ComponentBaker.
+### Create a new AuthoringComponent.
+
+1. With the standard baker:
 
 ```csharp
-public sealed class HealthComponentBaker : ComponentBaker<HealthComponent> { }
+public sealed class HealthAuthoringComponent : AuthoringComponent<HealthComponent> { }
 ```
 
-Add `HealthComponentBaker` into **Inspector**
-<details>
-  <summary>Inspector preview</summary>
-
-![Health Component Baker](https://i.postimg.cc/RVNG1K36/health-component.jpg)
-</details>
-
-Now you can control component values within the **Inspector**. Congratulations!
-
-> ⚠️ At this moment you can not control values from **Inspector** at **Runtime**
-
-### Choose conversion mode
-
-<details>
-  <summary>Inspector preview</summary>
-
-![Convert Mode](https://i.postimg.cc/J04qyBXq/convert-method.jpg)
-</details>
-
-| Mode                | Description                                                   |
-|---------------------|---------------------------------------------------------------|
-| Convert And Inject  | Just creates entities with components based on GameObject     |
-| Convert And Destroy | Deletes GameObject after conversion                           |
-| Convert And Save    | Stores associated GameObject entity in ConvertToEntity Script |
-
-You can also retrieve a value from **ConvertibleEntity**:
+2. Or with a custom one:
 
 ```csharp
-if (ConvertToEntity.TryGetEntity().HasValue) {
-    ConvertToEntity.TryGetEntity().Value
+public sealed class HealthAuthoringComponent : AuthoringComponent<HealthComponent> 
+{
+    public override IBaker<HealthComponent> CreateBaker(PackedEntityWithWorld entity) => new Baker(entity);
+
+    private sealed class Baker : IBaker<HealthComponent> 
+    {
+        public void Bake(IAuthoring authoring) 
+        {
+            // Implement your logic here.
+        }
+    }
 }
 ```
 
-### Convert Your GameObjects to Entity
+Add `HealthAuthoringComponent` to the **Inspector**
+<details>
+  <summary>Inspector preview</summary>
 
-You cant create `MonoBehaviour` for startup ECS.
-To Automatically convert **GameObjects** to **Entity** add `WorldSystemsExtensions.ConvertScene()` method.
+![Health Authoring Component](https://i.postimg.cc/Tw7K7nmS/health-component.jpg)
+</details>
+
+`AuthoringEntity` will be automatically added to the **GameObject**.
+This component is necessary for finding baked roots in the scene and store the packed entity from the ECS world.
+
+Now you can configure component values within the Inspector. Congratulations!
+
+> ⚠️ Currently, you **cannot** control values from the Inspector **during Runtime**.
+
+### Selecting conversion mode
+
+You can choose how to convert **GameObjects** to **Entity**.
+Currently, there are 3 modes available:
+
+<details>
+  <summary>Inspector preview</summary>
+
+![Conversion Mode](https://i.postimg.cc/4xkmSf7J/convert-method.jpg)
+</details>
+
+| Mode                | Description                                                                    |
+|---------------------|--------------------------------------------------------------------------------|
+| Convert and Inject  | Simply creates entities with components based on GameObjects.                  |
+| Convert and Destroy | Deletes the GameObject after conversion.                                       |
+| Convert and Save    | Stores the associated GameObject as an entity in the `AuthoringEntity` Script. |
+
+You can also retrieve the value from `AuthoringEntity`:
 
 ```csharp
-void Start() 
+if (_authoringEntity.TryGetEntity().HasValue) 
+{
+    _authoringEntity.TryGetEntity().Value;
+}
+```
+
+### Converting Your GameObjects to Entity
+
+To automatically convert GameObjects to Entity,
+create (or use existing) `IWorldSystems` and add the `ConvertScene` method:
+
+```csharp
+private void Start() 
 {
     _world = new World();    
     _systems = new WorldSystems(_world);
     _systems
-        .ConvertScene() // <- Need to add this method
+        .ConvertScene() // <- Need to add this method.
         .Add(new ExampleSystem());
     
     _systems.Initialize();
  }
 ```
 
-**ConvertScene** - method that automatically scan world,
-finds GameObjects with `ComponentBaker`,
-creates entity and adds initial Components to the Entity.
+`ConvertScene` automatically scans the scene,
+finds GameObjects with `AuthoringEntity` and `IAuthoring`,
+creates an entity, and adds components to the **Entity** from the ECS world.
 
-### Spawn Prefabs
+### Spawning Prefabs
 
-Every Prefab initialize with new entity. Components will be added automatically
+You can create prefabs with `AuthoringComponent`,
+and they will be converted to `Entity` after creation.
 
 ```csharp
-GameObject.Instantiate(gameObject, position, rotation);
-PhotonNetwork.Instantiate <- works in 3rd party Assets
+Object.Instantiate(gameObject, position, rotation);
+// Also works with 3rd party Assets:
+PhotonNetwork.Instantiate(...)
 ```
 
 ### Working with Unity Editor Extension
 
-Please, add `ConvertScene` method **after** UnityEditor extension
+Please, add `ConvertScene` method **after** UnityEditor extensions:
 
 ```csharp
 #if UNITY_EDITOR
         // Add debug systems for custom worlds here, for example:
         .Add(new WorldDebugSystem())
 #endif
-        .ConvertScene() // <- Need to add this method
+        .ConvertScene() // <- Need to add this method.
 ```
 
-## 🖇 Dependencies
+## 🖇️ Dependencies
 
-- [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git) - the base ecs library.
+- [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git) - the base ECS library.
 
 ## 🤝 Collaboration
 
 I welcome feature requests and bug reports in
-the [issues section](https://github.com/Depra-Inc/Ecs.Baking/issues), and I also
-accept [pull requests](https://github.com/Depra-Inc/Ecs.Baking/pulls).
+the [issues section](https://github.com/Depra-Inc/Ecs.Baking/issues),
+and I also accept [pull requests](https://github.com/Depra-Inc/Ecs.Baking/pulls).
 
 ## 🫂 Support
 
