@@ -1,8 +1,8 @@
 # Depra.Ecs.Baking - Unity Conversion Workflow для [Depra.Ecs](https://github.com/Leopotam/ecslite)
 
-![License](https://img.shields.io/github/license/Depra-Inc/Ecs.Baking)
-![Last Commit](https://img.shields.io/github/last-commit/Depra-Inc/Ecs.Baking)
-![Code Size](https://img.shields.io/github/languages/code-size/Depra-Inc/Ecs.Baking)
+![License](https://img.shields.io/github/license/Depra-Inc/Ecs.Baking?style=rounded-square)
+![Last Commit](https://img.shields.io/github/last-commit/Depra-Inc/Ecs.Baking?style=rounded-square)
+![Code Size](https://img.shields.io/github/languages/code-size/Depra-Inc/Ecs.Baking?style=rounded-square)
 
 <div>
     <strong><a href="README.md">English</a> | <a href="README.RU.md">Русский</a></strong>
