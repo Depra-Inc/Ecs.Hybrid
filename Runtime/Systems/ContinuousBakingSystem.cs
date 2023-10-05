@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
+using Depra.Ecs.Baking.Runtime.Entities;
 using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Components;
 using Depra.Ecs.Filters;
@@ -33,10 +34,9 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 			foreach (int entity in _entities)
 			{
 				ref var convertible = ref _convertibles[entity];
-
-				if (convertible.Value)
+				if (convertible.Value && convertible.Value.TryGetComponent(out AuthoringEntity authoringEntity))
 				{
-					BakingUtility.TryBake(convertible.Value, _convertibles.World);
+					BakingUtility.Bake(authoringEntity, _convertibles.World);
 				}
 
 				_world.DeleteEntity(entity);

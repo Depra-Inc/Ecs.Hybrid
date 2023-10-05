@@ -19,18 +19,10 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 #endif
 	internal static class BakingUtility
 	{
-		public static void TryBake(GameObject root, World world)
-		{
-			if (root.TryGetComponent(out AuthoringEntity authoringEntity))
-			{
-				Bake(authoringEntity, world);
-			}
-		}
-
-		private static void Bake(AuthoringEntity authoringEntity, World world)
+		public static void Bake(AuthoringEntity authoringEntity, World world)
 		{
 			var entity = world.CreateEntity();
-			var packedEntity = new PackedEntityWithWorld(entity, world, world.GetEntityGeneration(entity));
+			var packedEntity = world.PackEntityWithWorld(entity);
 
 			foreach (var authoringComponent in authoringEntity.GetComponents<AuthoringComponent>())
 			{

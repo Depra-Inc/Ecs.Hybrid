@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace Depra.Ecs.Baking.Runtime.Systems
 {
-	public readonly struct PreBakingSystem : IPreInitializeSystem
+	public readonly struct InitialBakingSystem : IPreInitializeSystem
 	{
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
 			foreach (var authoringEntity in Object.FindObjectsOfType<AuthoringEntity>())
 			{
-				BakingUtility.TryBake(authoringEntity.gameObject, systems.World);
+				BakingUtility.Bake(authoringEntity, systems.World);
 			}
 		}
 	}
