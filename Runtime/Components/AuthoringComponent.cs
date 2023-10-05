@@ -2,6 +2,7 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Baking.Runtime.Entities;
+using Depra.Ecs.Components;
 using Depra.Ecs.Entities;
 using UnityEngine;
 
@@ -12,8 +13,21 @@ namespace Depra.Ecs.Baking.Runtime.Components
 	{
 		[SerializeField] private TComponent _value;
 
-		protected TComponent Value => _value;
+		public virtual IBaker CreateBaker(PackedEntityWithWorld entity) => new Baker(entity);
 
-		public abstract IBaker CreateBaker(PackedEntityWithWorld entity);
+		private readonly struct Baker : IBaker
+		{
+			private readonly PackedEntityWithWorld _entity;
+
+			public Baker(PackedEntityWithWorld entity) => _entity = entity;
+
+			void IBaker.Bake(IAuthoring authoring)
+			{
+				if (_entity.Unpack(out var world, out var entity))
+				{
+					world.Pool<TComponent>().Replace(entity, ((AuthoringComponent<TComponent>) authoring)._value);
+				}
+			}
+		}
 	}
 }
