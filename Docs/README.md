@@ -5,7 +5,7 @@
 ![Code Size](https://img.shields.io/github/languages/code-size/Depra-Inc/Ecs.Baking?style=rounded-square)
 
 <div>
-    <strong><a href="README.md">English</a> | <a href="README.RU.md"></a></strong>
+    <strong><a href="README.md">English</a> | <a href="README.RU.md">Русский</a></strong>
 </div>
 
 <details>
