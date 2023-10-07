@@ -151,7 +151,7 @@ public sealed class HealthAuthoringComponent : MonoBehaviour, IAuthoring
 ![Health Authoring Component](https://i.postimg.cc/Dy1f4KVC/health-component.jpg)
 </details>
 
-Add `HealthAuthoringComponent` to the **Inspector**
+Add `HealthAuthoringComponent` to the **Inspector**.
 
 `AuthoringEntity` will be automatically added to the **GameObject**.
 This component is necessary for finding baked roots in the scene and store the packed entity from the ECS world.
