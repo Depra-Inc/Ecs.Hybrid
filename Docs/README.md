@@ -37,7 +37,7 @@ with tools for configuring entities through the **Unity Inspector** in scenes an
 
 - **Open Source**: This library is open source and free to use.
 - **Easy to use**: Simply add `AuthoringComponent` to your component and add `ConvertScene` method to
-  your `WorldSystems`.
+  your `IWorldSystems`.
 - **Convert Modes**: You can choose how to convert **GameObjects to **Entity**.
 - **Prefab support**: You can spawn Prefabs with `AuthoringComponent`
   and it will be converted to **Entity** after spawn.
@@ -108,12 +108,50 @@ public sealed class HealthAuthoringComponent : AuthoringComponent<HealthComponen
 }
 ```
 
-Add `HealthAuthoringComponent` to the **Inspector**
 <details>
   <summary>Inspector preview</summary>
 
 ![Health Authoring Component](https://i.postimg.cc/Tw7K7nmS/health-component.jpg)
 </details>
+
+3. If you don't like the nesting of `Value`, you can create your own implementation of `IAuthoring`:
+
+```csharp
+public sealed class HealthAuthoringComponent : MonoBehaviour, IAuthoring
+{
+    [Min(0)] [SerializeField] private float _value;
+
+    public IBaker CreateBaker(PackedEntityWithWorld entity) => new Baker(_value, entity);
+
+    private readonly struct Baker : IBaker
+    {
+        private readonly float _value;
+        private readonly PackedEntityWithWorld _entity;
+
+        public Baker(float value, PackedEntityWithWorld entity)
+        {
+            _value = value;
+            _entity = entity;
+        }
+
+        void IBaker.Bake(IAuthoring authoring)
+        {
+            if (_entity.Unpack(out var world, out var entity))
+            {
+                world.Pool<Health>().Replace(entity, _value);
+            }
+        }
+    }
+}
+```
+
+<details>
+  <summary>Inspector preview</summary>
+
+![Health Authoring Component](https://i.postimg.cc/Dy1f4KVC/health-component.jpg)
+</details>
+
+Add `HealthAuthoringComponent` to the **Inspector**
 
 `AuthoringEntity` will be automatically added to the **GameObject**.
 This component is necessary for finding baked roots in the scene and store the packed entity from the ECS world.

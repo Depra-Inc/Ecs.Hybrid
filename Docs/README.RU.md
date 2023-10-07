@@ -37,7 +37,7 @@
 
 - **Открытый исходный код**: Эта библиотека с открытым исходным кодом и бесплатна для использования.
 - **Прост в использовании**: Просто добавьте `AuthoringComponent` к вашему компоненту
-  и добавьте метод `ConvertScene` к вашим `WorldSystems`.
+  и добавьте метод `ConvertScene` к вашим `IWorldSystems`.
 - **Режимы конвертации**: Вы можете выбрать, как конвертировать **GameObjects** в **Entity**.
 - **Поддержка префабов**: Вы можете создавать префабы с `AuthoringComponent`,
   и они будут конвертироваться в **Unity.Entity** после создания.
@@ -107,12 +107,50 @@ public sealed class HealthAuthoringComponent : AuthoringComponent<HealthComponen
 }
 ```
 
-Добавьте `HealthAuthoringComponent` в **Inspector**.
 <details>
   <summary>Вид в инспекторе</summary>
 
 ![Health Authoring Component](https://i.postimg.cc/Tw7K7nmS/health-component.jpg)
 </details>
+
+3. Если не нравится вложенность `Value`, то можете создать свою реализацию `IAuthoring`:
+
+```csharp
+public sealed class HealthAuthoringComponent : MonoBehaviour, IAuthoring
+{
+    [Min(0)] [SerializeField] private float _value;
+
+    public IBaker CreateBaker(PackedEntityWithWorld entity) => new Baker(_value, entity);
+
+    private readonly struct Baker : IBaker
+    {
+        private readonly float _value;
+        private readonly PackedEntityWithWorld _entity;
+
+        public Baker(float value, PackedEntityWithWorld entity)
+        {
+            _value = value;
+            _entity = entity;
+        }
+
+        void IBaker.Bake(IAuthoring authoring)
+        {
+            if (_entity.Unpack(out var world, out var entity))
+            {
+                world.Pool<Health>().Replace(entity, _value);
+            }
+        }
+    }
+}
+```
+
+<details>
+  <summary>Вид в инспекторе</summary>
+
+![Health Authoring Component](https://i.postimg.cc/Dy1f4KVC/health-component.jpg)
+</details>
+
+Добавьте `HealthAuthoringComponent` в **Inspector**.
 
 `AuthoringEntity` будет автоматически добавлена к **GameObject**.
 Этот компонент необходим для поиска конвертированных корней в сцене и хранения упакованной сущности из мира ECS.
