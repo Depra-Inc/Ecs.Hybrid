@@ -3,13 +3,12 @@
 
 using System;
 using Depra.Ecs.Baking.Runtime.Components;
-using Depra.Ecs.Baking.Runtime.Entities;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Depra.Ecs.Baking.Runtime.Internal
+namespace Depra.Ecs.Baking.Runtime.Entities
 {
 #if ENABLE_IL2CPP
 	using Unity.IL2CPP.CompilerServices;
@@ -17,35 +16,40 @@ namespace Depra.Ecs.Baking.Runtime.Internal
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	internal static class BakingUtility
+	internal readonly ref struct AuthoringEntityBaker
 	{
-		public static void Bake(AuthoringEntity authoringEntity, World world)
+		private readonly AuthoringEntity _authoringEntity;
+
+		public AuthoringEntityBaker(AuthoringEntity authoringEntity) =>
+			_authoringEntity = authoringEntity;
+
+		public void Bake(World world)
 		{
 			var entity = world.CreateEntity();
 			var packedEntity = world.PackEntityWithWorld(entity);
 
-			foreach (var authoring in authoringEntity.GetComponents<IAuthoring>())
+			foreach (var authoring in _authoringEntity.GetComponents<IAuthoring>())
 			{
 				authoring.CreateBaker(packedEntity).Bake(authoring);
 				Object.Destroy((Component) authoring);
 			}
 
-			authoringEntity.MarkAsProcessed();
-			FinalizeConversion(authoringEntity, packedEntity);
+			_authoringEntity.MarkAsProcessed();
+			FinalizeConversion(packedEntity);
 		}
 
-		private static void FinalizeConversion(AuthoringEntity authoringEntity, PackedEntityWithWorld entity)
+		private void FinalizeConversion(PackedEntityWithWorld entity)
 		{
-			switch (authoringEntity._mode)
+			switch (_authoringEntity._mode)
 			{
 				case ConversionMode.CONVERT_AND_DESTROY:
-					Object.Destroy(authoringEntity.gameObject);
+					Object.Destroy(_authoringEntity.gameObject);
 					break;
 				case ConversionMode.CONVERT_AND_INJECT:
-					Object.Destroy(authoringEntity);
+					Object.Destroy(_authoringEntity);
 					break;
 				case ConversionMode.CONVERT_AND_SAVE:
-					authoringEntity.Initialize(entity);
+					_authoringEntity.Initialize(entity);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();

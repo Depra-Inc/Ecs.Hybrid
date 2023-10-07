@@ -2,7 +2,6 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Baking.Runtime.Entities;
-using Depra.Ecs.Baking.Runtime.Internal;
 using Depra.Ecs.Components;
 using Depra.Ecs.Filters;
 using Depra.Ecs.Systems;
@@ -20,23 +19,23 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	{
 		private World _world;
 		private EntityFilter _entities;
-		private ComponentPool<ConvertibleEntityRef> _convertibles;
+		private ComponentPool<BakingEntityRef> _bakingEntities;
 
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
 			_world = systems.World;
-			_entities = _world.Filter<ConvertibleEntityRef>().End();
-			_convertibles = _world.Pool<ConvertibleEntityRef>();
+			_entities = _world.Filter<BakingEntityRef>().End();
+			_bakingEntities = _world.Pool<BakingEntityRef>();
 		}
 
 		void IExecuteSystem.Execute(float frameTime)
 		{
 			foreach (int entity in _entities)
 			{
-				ref var convertible = ref _convertibles[entity];
-				if (convertible.Value && convertible.Value.TryGetComponent(out AuthoringEntity authoring))
+				ref var bakingEntity = ref _bakingEntities[entity];
+				if (bakingEntity.Value && bakingEntity.Value.TryGetComponent(out AuthoringEntity authoring))
 				{
-					BakingUtility.Bake(authoring, _convertibles.World);
+					new AuthoringEntityBaker(authoring).Bake(_bakingEntities.World);
 				}
 
 				_world.DeleteEntity(entity);

@@ -1,7 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Runtime.Internal;
+using Depra.Ecs.Baking.Runtime.Services;
 using Depra.Ecs.Entities;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace Depra.Ecs.Baking.Runtime.Entities
 			var world = BakingWorld.World;
 			if (world != null && _processed == false)
 			{
-				world.Pool<ConvertibleEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
+				world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 			}
 		}
 

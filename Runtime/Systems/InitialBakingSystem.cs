@@ -1,5 +1,7 @@
-﻿using Depra.Ecs.Baking.Runtime.Entities;
-using Depra.Ecs.Baking.Runtime.Internal;
+﻿// SPDX-License-Identifier: Apache-2.0
+// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+
+using Depra.Ecs.Baking.Runtime.Entities;
 using Depra.Ecs.Systems;
 using UnityEngine;
 
@@ -11,7 +13,7 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 		{
 			foreach (var authoringEntity in Object.FindObjectsOfType<AuthoringEntity>())
 			{
-				BakingUtility.Bake(authoringEntity, systems.World);
+				new AuthoringEntityBaker(authoringEntity).Bake(systems.World);
 			}
 		}
 	}
