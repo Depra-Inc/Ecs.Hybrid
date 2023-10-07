@@ -43,7 +43,7 @@ with tools for configuring entities through the **Unity Inspector** in scenes an
   and it will be converted to **Entity** after spawn.
 - **Extensibility**: Flexible architecture for extending functionality according to your needs.
 - **Entities-like**: This library is similar to **Unity.Entities** conversion workflow.
-- **Lightweight**: This library is lightweight and has single dependency.
+- **Lightweight**: The library contains a small amount of code and has only one dependency.
 - **Declarative**: You can control your component values within the **Unity Inspector**.
 
 ## 📥 Installation
@@ -233,7 +233,7 @@ Please, add `ConvertScene` method **after** UnityEditor extensions:
 
 ## 🖇️ Dependencies
 
-- [Depra.Ecs](https://github.com/Depra-Inc/Ecs.git) - the base ECS library.
+- [Depra.Ecs](https://github.com/Depra-Inc/Ecs) - the base ECS library.
 
 ## 🤝 Collaboration
 
