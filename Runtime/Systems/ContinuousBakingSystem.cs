@@ -1,13 +1,13 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Runtime.Entities;
+using Depra.Ecs.Baking.Entities;
 using Depra.Ecs.Components;
-using Depra.Ecs.Filters;
+using Depra.Ecs.Entities;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
 
-namespace Depra.Ecs.Baking.Runtime.Systems
+namespace Depra.Ecs.Baking.Systems
 {
 #if ENABLE_IL2CPP
 	using Unity.IL2CPP.CompilerServices;
@@ -18,19 +18,19 @@ namespace Depra.Ecs.Baking.Runtime.Systems
 	public sealed class ContinuousBakingSystem : IPreInitializeSystem, IExecuteSystem
 	{
 		private World _world;
-		private EntityFilter _entities;
+		private EntityGroup _entities;
 		private ComponentPool<BakingEntityRef> _bakingEntities;
 
 		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
 		{
 			_world = systems.World;
-			_entities = _world.Filter<BakingEntityRef>().End();
+			_entities = _world.Group<BakingEntityRef>().End();
 			_bakingEntities = _world.Pool<BakingEntityRef>();
 		}
 
 		void IExecuteSystem.Execute(float frameTime)
 		{
-			foreach (int entity in _entities)
+			foreach (var entity in _entities)
 			{
 				ref var bakingEntity = ref _bakingEntities[entity];
 				if (bakingEntity.Value && bakingEntity.Value.TryGetComponent(out AuthoringEntity authoring))

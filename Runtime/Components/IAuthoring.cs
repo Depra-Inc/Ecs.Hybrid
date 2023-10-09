@@ -3,7 +3,7 @@
 
 using Depra.Ecs.Entities;
 
-namespace Depra.Ecs.Baking.Runtime.Components
+namespace Depra.Ecs.Baking.Components
 {
 	public interface IAuthoring
 	{

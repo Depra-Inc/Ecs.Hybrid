@@ -1,11 +1,11 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Runtime.Services;
+using Depra.Ecs.Baking.Services;
 using Depra.Ecs.Entities;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Runtime.Entities
+namespace Depra.Ecs.Baking.Entities
 {
 	[DisallowMultipleComponent]
 	public sealed class AuthoringEntity : MonoBehaviour

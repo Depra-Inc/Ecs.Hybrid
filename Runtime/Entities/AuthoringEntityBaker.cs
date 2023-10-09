@@ -2,13 +2,13 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System;
-using Depra.Ecs.Baking.Runtime.Components;
+using Depra.Ecs.Baking.Components;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Depra.Ecs.Baking.Runtime.Entities
+namespace Depra.Ecs.Baking.Entities
 {
 #if ENABLE_IL2CPP
 	using Unity.IL2CPP.CompilerServices;

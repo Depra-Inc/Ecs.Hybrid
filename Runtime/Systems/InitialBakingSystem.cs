@@ -1,11 +1,11 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Runtime.Entities;
+using Depra.Ecs.Baking.Entities;
 using Depra.Ecs.Systems;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Runtime.Systems
+namespace Depra.Ecs.Baking.Systems
 {
 	public readonly struct InitialBakingSystem : IPreInitializeSystem
 	{

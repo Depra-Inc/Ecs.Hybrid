@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Runtime.Entities
+namespace Depra.Ecs.Baking.Entities
 {
 	internal enum ConversionMode
 	{
