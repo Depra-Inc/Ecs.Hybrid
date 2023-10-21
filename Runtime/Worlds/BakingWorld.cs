@@ -3,7 +3,7 @@
 
 using Depra.Ecs.Worlds;
 
-namespace Depra.Ecs.Baking.Services
+namespace Depra.Ecs.Baking.Worlds
 {
 	internal static class BakingWorld
 	{

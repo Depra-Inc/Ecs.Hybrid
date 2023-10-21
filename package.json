@@ -1,6 +1,6 @@
 {
 	"name": "com.depra.ecs.baking",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"displayName": "Depra.Ecs.Baking",
 	"description": "Unity Conversion Workflow for Depra.Ecs. Easy convert GameObjects to Entity.",
 	"unity": "2022.3",

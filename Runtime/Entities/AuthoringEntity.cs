@@ -1,14 +1,16 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Services;
-using Depra.Ecs.Entities;
+using Depra.Ecs.Baking.Components;
+using Depra.Ecs.Baking.Worlds;
+using Depra.Ecs.QoL.Entities;
+using Depra.Ecs.QoL.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Entities
 {
 	[DisallowMultipleComponent]
-	public sealed class AuthoringEntity : MonoBehaviour
+	public sealed class AuthoringEntity : MonoBehaviour, IAuthoringEntity
 	{
 		[SerializeField] internal ConversionMode _mode;
 
@@ -23,6 +25,8 @@ namespace Depra.Ecs.Baking.Entities
 				world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 			}
 		}
+
+		public IAuthoring[] Components => GetComponents<IAuthoring>();
 
 		public int? TryGetEntity() => _entity.Unpack(out _, out var entity) ? entity : null;
 

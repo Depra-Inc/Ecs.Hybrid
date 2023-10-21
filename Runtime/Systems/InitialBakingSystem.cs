@@ -3,17 +3,18 @@
 
 using Depra.Ecs.Baking.Entities;
 using Depra.Ecs.Systems;
+using Depra.Ecs.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Systems
 {
-	public readonly struct InitialBakingSystem : IPreInitializeSystem
+	public readonly struct InitialBakingSystem : IPreInitializationSystem
 	{
-		void IPreInitializeSystem.PreInitialize(IWorldSystems systems)
+		void IPreInitializationSystem.PreInitialize(World world)
 		{
 			foreach (var authoringEntity in Object.FindObjectsOfType<AuthoringEntity>())
 			{
-				new AuthoringEntityBaker(authoringEntity).Bake(systems.World);
+				new AuthoringEntityBaker(authoringEntity).Bake(world);
 			}
 		}
 	}

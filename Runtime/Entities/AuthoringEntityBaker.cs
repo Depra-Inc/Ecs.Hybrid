@@ -3,7 +3,8 @@
 
 using System;
 using Depra.Ecs.Baking.Components;
-using Depra.Ecs.Entities;
+using Depra.Ecs.QoL.Entities;
+using Depra.Ecs.QoL.Worlds;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using Object = UnityEngine.Object;

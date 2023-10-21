@@ -9,7 +9,7 @@ namespace Depra.Ecs.Baking.Systems
 	public static class WorldSystemsExtensions
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static IWorldSystems ConvertScene<TSystems>(this TSystems self) where TSystems : IWorldSystems => self
+		public static WorldSystems ConvertScene(this WorldSystems self) => self
 			.Add(new BakingServiceSystem())
 			.Add(new InitialBakingSystem())
 			.Add(new ContinuousBakingSystem());

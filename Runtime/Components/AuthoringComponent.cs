@@ -2,8 +2,9 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Baking.Entities;
-using Depra.Ecs.Components;
-using Depra.Ecs.Entities;
+using Depra.Ecs.QoL.Components;
+using Depra.Ecs.QoL.Entities;
+using Depra.Ecs.QoL.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Baking.Components
