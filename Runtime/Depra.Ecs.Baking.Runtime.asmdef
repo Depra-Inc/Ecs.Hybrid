@@ -8,7 +8,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Depra.Ecs.dll",
-        "Depra.Ecs.QoL.dll"
+        "Depra.Ecs.QoL.dll",
+        "Depra.Ecs.Modular.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

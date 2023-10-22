@@ -13,6 +13,6 @@ namespace Depra.Ecs.Baking.Systems
 			BakingWorld.Initialize(world);
 
 		void ITerminationSystem.Terminate(World world) =>
-			BakingWorld.Destroy();
+			BakingWorld.Dispose();
 	}
 }

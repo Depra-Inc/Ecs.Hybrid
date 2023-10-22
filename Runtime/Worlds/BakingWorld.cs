@@ -11,6 +11,6 @@ namespace Depra.Ecs.Baking.Worlds
 
 		public static void Initialize(World world) => World = world;
 
-		public static void Destroy() => World = null;
+		public static void Dispose() => World = null;
 	}
 }
