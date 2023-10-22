@@ -20,9 +20,9 @@ namespace Depra.Ecs.Baking.Samples
 				new ReviewModule());
 
 			_world = new World(modules.BuildRegistry());
-			var systems = new WorldSystems(_world);
-			modules.Initialize(systems);
-			_systems = systems.Initialize();
+			_systems = new WorldSystems(_world)
+				.AddModules(modules)
+				.Initialize();
 		}
 
 		private void Update() => _systems?.Execute(Time.deltaTime);
@@ -36,7 +36,12 @@ namespace Depra.Ecs.Baking.Samples
 		private sealed class ReviewModule : IEcsModule
 		{
 			IEcsModule[] IEcsModule.Modules => Array.Empty<IEcsModule>();
-			IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new Registry() };
+
+			IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[]
+			{
+				new Registry(),
+				new BackingWorldRegistry()
+			};
 
 			void IEcsModule.Initialize(WorldSystems systems) { }
 
@@ -44,11 +49,7 @@ namespace Depra.Ecs.Baking.Samples
 			{
 				void IWorldRegistry.Initialize(World world)
 				{
-					IWorldRegistry backingWorldRegistry = new BackingWorldRegistry();
-					backingWorldRegistry.Initialize(world);
-					world.AddRegistry(backingWorldRegistry);
 					world.AddRegistry(this);
-
 					world.AddPool(new ComponentPool<Health>());
 					world.AddPool(new ComponentPool<Damage>());
 					world.AddPool(new ComponentPool<DeadTag>());
