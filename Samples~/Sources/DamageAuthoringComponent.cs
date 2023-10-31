@@ -1,9 +1,9 @@
-using Depra.Ecs.Baking.Components;
+using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Samples
+namespace Depra.Ecs.Hybrid.Samples
 {
 	internal sealed class DamageAuthoringComponent : MonoBehaviour, IAuthoring
 	{

@@ -1,10 +1,10 @@
-using Depra.Ecs.Baking.Components;
+using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.QoL.Components;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Samples
+namespace Depra.Ecs.Hybrid.Samples
 {
 	public sealed class HealthAuthoringComponent : MonoBehaviour, IAuthoring
 	{

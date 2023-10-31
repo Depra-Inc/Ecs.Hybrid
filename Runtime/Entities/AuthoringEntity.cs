@@ -1,13 +1,13 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
-using Depra.Ecs.Baking.Components;
-using Depra.Ecs.Baking.Worlds;
+using Depra.Ecs.Hybrid.Components;
+using Depra.Ecs.Hybrid.Worlds;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Entities
+namespace Depra.Ecs.Hybrid.Entities
 {
 	[DisallowMultipleComponent]
 	public sealed class AuthoringEntity : MonoBehaviour, IAuthoringEntity

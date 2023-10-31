@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Entities
+namespace Depra.Ecs.Hybrid.Entities
 {
 	[Serializable]
 	internal struct BakingEntityRef

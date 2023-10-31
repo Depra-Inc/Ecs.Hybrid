@@ -2,16 +2,17 @@
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System;
-using Depra.Ecs.Baking.Systems;
+using Depra.Ecs.Hybrid.Systems;
 using Depra.Ecs.Modular;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
 
-namespace Depra.Ecs.Baking.Worlds
+namespace Depra.Ecs.Hybrid.Worlds
 {
-	public readonly struct BakingModule : IEcsModule
+	public readonly struct RuntimeSceneBaking : IEcsModule
 	{
 		IEcsModule[] IEcsModule.Modules => Array.Empty<IEcsModule>();
+
 		IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new BackingWorldRegistry() };
 
 		void IEcsModule.Initialize(IWorldSystems systems) => systems

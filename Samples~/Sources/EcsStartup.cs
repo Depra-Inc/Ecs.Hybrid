@@ -1,12 +1,12 @@
 ﻿using System;
-using Depra.Ecs.Baking.Worlds;
+using Depra.Ecs.Hybrid.Worlds;
 using Depra.Ecs.Components;
 using Depra.Ecs.Modular;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 
-namespace Depra.Ecs.Baking.Samples
+namespace Depra.Ecs.Hybrid.Samples
 {
 	internal sealed class EcsStartup : MonoBehaviour
 	{
@@ -16,7 +16,7 @@ namespace Depra.Ecs.Baking.Samples
 		private void Start()
 		{
 			var modules = new EcsModules(
-				new BakingModule(),
+				new RuntimeSceneBaking(),
 				new ReviewModule());
 
 			_world = new World(modules.BuildRegistry());
@@ -37,13 +37,9 @@ namespace Depra.Ecs.Baking.Samples
 		{
 			IEcsModule[] IEcsModule.Modules => Array.Empty<IEcsModule>();
 
-			IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[]
-			{
-				new Registry(),
-				new BackingWorldRegistry()
-			};
+			IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new Registry(), };
 
-			void IEcsModule.Initialize(WorldSystems systems) { }
+			void IEcsModule.Initialize(IWorldSystems systems) { }
 
 			private sealed class Registry : IWorldRegistry
 			{

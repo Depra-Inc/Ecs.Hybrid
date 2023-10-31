@@ -1,6 +1,6 @@
-﻿using Depra.Ecs.Baking.Components;
+﻿using Depra.Ecs.Hybrid.Components;
 
-namespace Depra.Ecs.Baking.Entities
+namespace Depra.Ecs.Hybrid.Entities
 {
 	internal interface IAuthoringEntity
 	{

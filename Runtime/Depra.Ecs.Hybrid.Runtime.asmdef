@@ -1,5 +1,5 @@
 {
-    "name": "Depra.Ecs.Baking.Runtime",
+    "name": "Depra.Ecs.Hybrid.Runtime",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

@@ -1,8 +1,8 @@
-﻿using Depra.Ecs.Baking.Entities;
-using Depra.Ecs.Components;
+﻿using Depra.Ecs.Components;
+using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.Worlds;
 
-namespace Depra.Ecs.Baking.Worlds
+namespace Depra.Ecs.Hybrid.Worlds
 {
 	public sealed class BackingWorldRegistry : IWorldRegistry
 	{
