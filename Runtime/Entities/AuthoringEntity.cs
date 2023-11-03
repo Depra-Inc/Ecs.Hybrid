@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023 Nikolay Melnikov <n.melnikov@depra.org>
 
+using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Worlds;
 using Depra.Ecs.QoL.Entities;
@@ -28,7 +29,7 @@ namespace Depra.Ecs.Hybrid.Entities
 
 		public IAuthoring[] Components => GetComponents<IAuthoring>();
 
-		public int? TryGetEntity() => _entity.Unpack(out _, out var entity) ? entity : null;
+		public bool TryGetEntity(out Entity entity) => _entity.Unpack(out _, out entity);
 
 		internal void Initialize(PackedEntityWithWorld entity) => _entity = entity;
 

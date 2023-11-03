@@ -13,7 +13,7 @@ namespace Depra.Ecs.Hybrid.Worlds
 	{
 		IEcsModule[] IEcsModule.Modules => Array.Empty<IEcsModule>();
 
-		IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new BackingWorldRegistry() };
+		IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new SceneBakingRegistry() };
 
 		void IEcsModule.Initialize(IWorldSystems systems) => systems
 			.Add(new BakingServiceSystem())

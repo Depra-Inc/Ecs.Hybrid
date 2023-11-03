@@ -12,7 +12,8 @@ namespace Depra.Ecs.Hybrid.Systems
 	{
 		void IPreInitializationSystem.PreInitialize(World world)
 		{
-			foreach (var authoringEntity in Object.FindObjectsOfType<AuthoringEntity>())
+			var authoringEntities = Object.FindObjectsOfType<AuthoringEntity>();
+			foreach (var authoringEntity in authoringEntities)
 			{
 				new AuthoringEntityBaker(authoringEntity).Bake(world);
 			}
