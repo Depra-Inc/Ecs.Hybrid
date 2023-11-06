@@ -35,7 +35,7 @@ namespace Depra.Ecs.Hybrid.Systems
 			var bakingObject = _bakingEntities[entity].Value;
 			if (bakingObject && bakingObject.TryGetComponent(out IAuthoringEntity authoring))
 			{
-				authoring.CreateBaker(_bakingEntities.World).Bake(authoring);
+				authoring.CreateBaker().Bake(authoring, _bakingEntities.World);
 			}
 
 			_bakingEntities.World.DeleteEntity(entity);

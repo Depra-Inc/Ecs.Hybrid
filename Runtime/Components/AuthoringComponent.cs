@@ -14,25 +14,23 @@ namespace Depra.Ecs.Hybrid.Components
 	{
 		[SerializeField] private TComponent _value;
 
-		public virtual IBaker CreateBaker(World world) => new Baker(world, this);
+		public virtual IBaker CreateBaker() => new Baker(this);
 
 		private readonly struct Baker : IBaker
 		{
-			private readonly World _world;
 			private readonly AuthoringComponent<TComponent> _authoringComponent;
 
-			public Baker(World world, AuthoringComponent<TComponent> authoringComponent)
+			public Baker(AuthoringComponent<TComponent> authoringComponent)
 			{
-				_world = world;
 				_authoringComponent = authoringComponent;
 			}
 
-			void IBaker.Bake(IAuthoring authoring)
+			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 				var authoringEntity = (IAuthoringEntity) authoring;
 				if (authoringEntity.TryGetEntity(out var entity))
 				{
-					_world.Pool<TComponent>().Replace(entity, _authoringComponent._value);
+					world.Pool<TComponent>().Replace(entity, _authoringComponent._value);
 				}
 			}
 		}

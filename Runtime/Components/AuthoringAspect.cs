@@ -7,24 +7,19 @@ namespace Depra.Ecs.Hybrid.Components
 	{
 		[SerializeField] private GameObject _scope;
 
-		IBaker IAuthoring.CreateBaker(World world) => new Baker(world, _scope);
+		IBaker IAuthoring.CreateBaker() => new Baker(_scope);
 
 		private readonly struct Baker : IBaker
 		{
-			private readonly World _world;
 			private readonly GameObject _scope;
 
-			public Baker(World world, GameObject scope)
-			{
-				_world = world;
-				_scope = scope;
-			}
+			public Baker(GameObject scope) => _scope = scope;
 
-			void IBaker.Bake(IAuthoring authoring)
+			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 				foreach (var authoringComponents in _scope.GetComponents<IAuthoring>())
 				{
-					authoringComponents.CreateBaker(_world).Bake(authoring);
+					authoringComponents.CreateBaker().Bake(authoring, world);
 					Destroy((Component) authoringComponents);
 				}
 			}

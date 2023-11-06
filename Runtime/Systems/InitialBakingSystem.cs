@@ -13,7 +13,7 @@ namespace Depra.Ecs.Hybrid.Systems
 		{
 			foreach (var authoringEntity in InterfaceService.FindOnActiveScene<IAuthoringEntity>())
 			{
-				authoringEntity.CreateBaker(world).Bake(authoringEntity);
+				authoringEntity.CreateBaker().Bake(authoringEntity, world);
 			}
 		}
 	}

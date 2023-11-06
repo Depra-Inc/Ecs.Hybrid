@@ -24,10 +24,9 @@ namespace Depra.Ecs.Hybrid.Entities
 
 		private void OnEnable()
 		{
-			var world = BakingWorld.World;
-			if (world != null && _processed == false)
+			if (BakingWorld.World != null && _processed == false)
 			{
-				world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
+				BakingWorld.World.Pool<BakingEntityRef>().Allocate(BakingWorld.World.CreateEntity()).Value = gameObject;
 			}
 		}
 
@@ -59,25 +58,21 @@ namespace Depra.Ecs.Hybrid.Entities
 			}
 		}
 
-		IBaker IAuthoring.CreateBaker(World world) => new Backer(world);
+		IBaker IAuthoring.CreateBaker() => new Backer();
 
 		bool IAuthoringEntity.TryGetEntity(out Entity entity) => _entity.Unpack(out _, out entity);
 
 		private readonly struct Backer : IBaker
 		{
-			private readonly World _world;
-
-			public Backer(World world) => _world = world;
-
-			void IBaker.Bake(IAuthoring authoring)
+			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var entity = _world.CreateEntity();
+				var entity = world.CreateEntity();
 				var authoringEntity = (AuthoringEntity) authoring;
-				authoringEntity.Initialize(_world.PackEntityWithWorld(entity));
+				authoringEntity.Initialize(world.PackEntityWithWorld(entity));
 
 				foreach (var element in authoringEntity.Nested)
 				{
-					element.CreateBaker(_world).Bake(authoringEntity);
+					element.CreateBaker().Bake(authoringEntity, world);
 					Destroy((Component) element);
 				}
 
