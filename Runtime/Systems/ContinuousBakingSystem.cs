@@ -24,22 +24,21 @@ namespace Depra.Ecs.Hybrid.Systems
 
 		void IPreInitializationSystem.PreInitialize(World world)
 		{
+			_entities = new EntityIterator(typeof(BakingEntityRef))
+				.Initialize(world);
+
 			_bakingEntities = world.Pool<BakingEntityRef>();
-			_entities = new EntityIterator(typeof(BakingEntityRef)).Initialize(world);
 		}
 
-		void IExecutionSystem.Execute(float frameTime)
+		void IExecutionSystem.Execute(float frameTime) => _entities.ForEach(entity =>
 		{
-			foreach (var entity in _entities)
+			var bakingObject = _bakingEntities[entity].Value;
+			if (bakingObject && bakingObject.TryGetComponent(out IAuthoringEntity authoring))
 			{
-				var bakingObject = _bakingEntities[entity].Value;
-				if (bakingObject && bakingObject.TryGetComponent(out AuthoringEntity authoring))
-				{
-					new AuthoringEntityBaker(authoring).Bake(_bakingEntities.World);
-				}
-
-				_bakingEntities.World.DeleteEntity(entity);
+				authoring.CreateBaker(_bakingEntities.World).Bake(authoring);
 			}
-		}
+
+			_bakingEntities.World.DeleteEntity(entity);
+		});
 	}
 }

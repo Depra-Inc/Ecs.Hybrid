@@ -4,7 +4,6 @@
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
-using UnityEngine;
 
 namespace Depra.Ecs.Hybrid.Systems
 {
@@ -12,10 +11,9 @@ namespace Depra.Ecs.Hybrid.Systems
 	{
 		void IPreInitializationSystem.PreInitialize(World world)
 		{
-			var authoringEntities = Object.FindObjectsOfType<AuthoringEntity>();
-			foreach (var authoringEntity in authoringEntities)
+			foreach (var authoringEntity in InterfaceService.FindOnActiveScene<IAuthoringEntity>())
 			{
-				new AuthoringEntityBaker(authoringEntity).Bake(world);
+				authoringEntity.CreateBaker(world).Bake(authoringEntity);
 			}
 		}
 	}

@@ -1,9 +1,13 @@
-﻿using Depra.Ecs.Hybrid.Components;
+﻿using System.Collections.Generic;
+using Depra.Ecs.Entities;
+using Depra.Ecs.Hybrid.Components;
 
 namespace Depra.Ecs.Hybrid.Entities
 {
-	internal interface IAuthoringEntity
+	public interface IAuthoringEntity : IAuthoring
 	{
-		IAuthoring[] Components { get; }
+		IEnumerable<IAuthoring> Nested { get; }
+
+		bool TryGetEntity(out Entity entity);
 	}
 }

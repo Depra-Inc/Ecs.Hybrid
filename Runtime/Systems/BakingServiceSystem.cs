@@ -9,10 +9,8 @@ namespace Depra.Ecs.Hybrid.Systems
 {
 	public readonly struct BakingServiceSystem : IPreInitializationSystem, ITerminationSystem
 	{
-		void IPreInitializationSystem.PreInitialize(World world) =>
-			BakingWorld.Initialize(world);
+		void IPreInitializationSystem.PreInitialize(World world) => BakingWorld.Initialize(world);
 
-		void ITerminationSystem.Terminate(World world) =>
-			BakingWorld.Dispose();
+		void ITerminationSystem.Terminate(World world) => BakingWorld.Dispose();
 	}
 }
