@@ -1,5 +1,5 @@
 {
-    "name": "Depra.Ecs.Hybrid.Runtime",
+    "name": "Depra.Ecs.Hybrid",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

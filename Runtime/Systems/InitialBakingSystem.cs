@@ -11,7 +11,8 @@ namespace Depra.Ecs.Hybrid.Systems
 	{
 		void IPreInitializationSystem.PreInitialize(World world)
 		{
-			foreach (var authoringEntity in InterfaceService.FindOnActiveScene<IAuthoringEntity>())
+			var entities = InterfaceService.FindOnActiveScene<IAuthoringEntity>();
+			foreach (var authoringEntity in entities)
 			{
 				authoringEntity.CreateBaker().Bake(authoringEntity, world);
 			}

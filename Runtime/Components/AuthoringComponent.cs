@@ -27,8 +27,7 @@ namespace Depra.Ecs.Hybrid.Components
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var authoringEntity = (IAuthoringEntity) authoring;
-				if (authoringEntity.TryGetEntity(out var entity))
+				if (((IAuthoringEntity) authoring).Unpack(out var entity))
 				{
 					world.Pool<TComponent>().Replace(entity, _authoringComponent._value);
 				}

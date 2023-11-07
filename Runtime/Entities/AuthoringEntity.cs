@@ -30,10 +30,8 @@ namespace Depra.Ecs.Hybrid.Entities
 			}
 		}
 
-		private IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
+		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
 			.Where(x => ReferenceEquals(x, this) == false);
-
-		IEnumerable<IAuthoring> IAuthoringEntity.Nested => Nested;
 
 		private void Initialize(PackedEntityWithWorld entity)
 		{
@@ -60,7 +58,7 @@ namespace Depra.Ecs.Hybrid.Entities
 
 		IBaker IAuthoring.CreateBaker() => new Backer();
 
-		bool IAuthoringEntity.TryGetEntity(out Entity entity) => _entity.Unpack(out _, out entity);
+		bool IAuthoringEntity.Unpack(out Entity entity) => _entity.Unpack(out _, out entity);
 
 		private readonly struct Backer : IBaker
 		{

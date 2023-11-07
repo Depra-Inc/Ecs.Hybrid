@@ -8,6 +8,6 @@ namespace Depra.Ecs.Hybrid.Entities
 	{
 		IEnumerable<IAuthoring> Nested { get; }
 
-		bool TryGetEntity(out Entity entity);
+		bool Unpack(out Entity entity);
 	}
 }
