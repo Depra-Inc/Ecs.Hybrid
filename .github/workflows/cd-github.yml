@@ -1,4 +1,4 @@
-name: GitHub Packages CD
+name: CD GitHub Packages
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    uses: Depra-Inc/Workflows/.github/workflows/deploy-github.yml@main
+    uses: Depra-Inc/Workflows/.github/workflows/cd-github.yml@main
     secrets:
       node_auth_token: ${{secrets.GITHUB_TOKEN}}
       discord_webhook: ${{secrets.DISCORD_WEBHOOK}}
