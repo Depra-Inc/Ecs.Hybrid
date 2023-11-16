@@ -19,15 +19,13 @@ namespace Depra.Ecs.Hybrid.Systems
 #endif
 	public sealed class ContinuousBakingSystem : IPreInitializationSystem, IExecutionSystem
 	{
-		private IEntityIterator _entities;
+		private IEntityQuery _entities;
 		private ComponentPool<BakingEntityRef> _bakingEntities;
 
 		void IPreInitializationSystem.PreInitialize(World world)
 		{
-			_entities = new EntityIterator(typeof(BakingEntityRef))
-				.Initialize(world);
-
 			_bakingEntities = world.Pool<BakingEntityRef>();
+			_entities = new EntityQuery(typeof(BakingEntityRef)).Initialize(world);
 		}
 
 		void IExecutionSystem.Execute(float frameTime) => _entities.ForEach(entity =>

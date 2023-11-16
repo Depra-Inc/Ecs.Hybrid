@@ -1,0 +1,19 @@
+name: Deploy Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-npm:
+    uses: Depra-Inc/Workflows/.github/workflows/deploy-npm.yml@main
+    secrets:
+      node_auth_token: ${{secrets.NPM_AUTH_TOKEN}}
+      discord_webhook: ${{secrets.DISCORD_WEBHOOK}}
+
+  deploy-github:
+    uses: Depra-Inc/Workflows/.github/workflows/deploy-github.yml@main
+    secrets:
+      node_auth_token: ${{secrets.GITHUB_TOKEN}}
+      discord_webhook: ${{secrets.DISCORD_WEBHOOK}}
