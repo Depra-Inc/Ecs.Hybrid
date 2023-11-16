@@ -1,4 +1,4 @@
-name: Deploying the package to NPM
+name: NPM CD
 
 on:
   workflow_dispatch:
