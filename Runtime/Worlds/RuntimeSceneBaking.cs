@@ -9,13 +9,13 @@ using Depra.Ecs.Worlds;
 
 namespace Depra.Ecs.Hybrid.Worlds
 {
-	public readonly struct RuntimeSceneBaking : IEcsModule
+	public readonly struct RuntimeSceneBaking : IModule
 	{
-		IEcsModule[] IEcsModule.Modules => Array.Empty<IEcsModule>();
+		IModule[] IModule.Modules => Array.Empty<IModule>();
 
-		IWorldRegistry[] IEcsModule.Registries => new IWorldRegistry[] { new SceneBakingRegistry() };
+		IWorldRegistry[] IModule.Registries => new IWorldRegistry[] { new SceneBakingRegistry() };
 
-		void IEcsModule.Initialize(IWorldSystems systems) => systems
+		void IModule.Initialize(ISystemGroup systems) => systems
 			.Add(new BakingServiceSystem())
 			.Add(new InitialBakingSystem())
 			.Add(new ContinuousBakingSystem());

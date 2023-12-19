@@ -1,4 +1,7 @@
-﻿using Depra.Ecs.Worlds;
+﻿// SPDX-License-Identifier: Apache-2.0
+// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+
+using Depra.Ecs.Worlds;
 using UnityEngine;
 
 namespace Depra.Ecs.Hybrid.Components
@@ -17,10 +20,10 @@ namespace Depra.Ecs.Hybrid.Components
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				foreach (var authoringComponents in _scope.GetComponents<IAuthoring>())
+				foreach (var authoringComponent in _scope.GetComponents<IAuthoring>())
 				{
-					authoringComponents.CreateBaker().Bake(authoring, world);
-					Destroy((Component) authoringComponents);
+					authoringComponent.CreateBaker().Bake(authoring, world);
+					Destroy((Component) authoringComponent);
 				}
 			}
 		}

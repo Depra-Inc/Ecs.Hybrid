@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace Depra.Ecs.Hybrid.Components
 {
-	[RequireComponent(typeof(AuthoringEntity))]
 	public abstract class AuthoringComponent<TComponent> : MonoBehaviour, IAuthoring where TComponent : struct
 	{
 		[SerializeField] private TComponent _value;
