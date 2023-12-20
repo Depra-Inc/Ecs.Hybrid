@@ -1,7 +1,9 @@
 {
     "name": "Depra.Ecs.Hybrid",
     "rootNamespace": "Depra.Ecs.Hybrid",
-    "references": [],
+    "references": [
+        "GUID:d4d2d3673d7d2a146884ebf91bc9e015"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

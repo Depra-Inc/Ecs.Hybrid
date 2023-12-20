@@ -20,10 +20,11 @@ namespace Depra.Ecs.Hybrid.Components
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				foreach (var authoringComponent in _scope.GetComponents<IAuthoring>())
+				var components = _scope.GetComponents<IAuthoring>();
+				foreach (var component in components)
 				{
-					authoringComponent.CreateBaker().Bake(authoring, world);
-					Destroy((Component) authoringComponent);
+					component.CreateBaker().Bake(authoring, world);
+					Destroy((Component) component);
 				}
 			}
 		}
