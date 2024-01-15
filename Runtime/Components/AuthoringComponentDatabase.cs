@@ -1,8 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Hybrid.Entities;
-using Depra.Ecs.Unity.Static;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace Depra.Ecs.Hybrid.Components
 	{
 		[SerializeField] private ComponentDatabase[] _components;
 
-		public IBaker CreateBaker() => new Baker(_components);
+		IBaker IAuthoring.CreateBaker() => new Baker(_components);
 
 		private readonly struct Baker : IBaker
 		{
