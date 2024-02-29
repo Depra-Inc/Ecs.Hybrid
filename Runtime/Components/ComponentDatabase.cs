@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Depra.Ecs.Entities;
 using Depra.Ecs.QoL.Components;
@@ -18,6 +19,8 @@ namespace Depra.Ecs.Hybrid.Components
 
 		private const string FILE_NAME = nameof(ComponentDatabase);
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;
+
+		public IEnumerable<IComponent> Components => _components;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Setup(World world, Entity entity)
