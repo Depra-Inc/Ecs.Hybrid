@@ -4,9 +4,11 @@
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.Worlds;
 using UnityEngine;
+using static Depra.Ecs.Hybrid.Module;
 
 namespace Depra.Ecs.Hybrid.Components
 {
+	[AddComponentMenu(MENU_PATH + nameof(AuthoringComponentDatabase), DEFAULT_ORDER)]
 	public sealed class AuthoringComponentDatabase : MonoBehaviour, IAuthoring
 	{
 		[SerializeField] private ComponentDatabase[] _components;

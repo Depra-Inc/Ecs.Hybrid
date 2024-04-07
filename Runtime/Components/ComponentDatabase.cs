@@ -27,7 +27,7 @@ namespace Depra.Ecs.Hybrid.Components
 		{
 			foreach (var component in _components)
 			{
-				world.Pool(component.GetType()).Allocate(entity, component);
+				world.Pools[component.GetType()].Allocate(entity, component);
 			}
 		}
 	}

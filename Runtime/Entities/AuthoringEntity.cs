@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System;
 using System.Collections.Generic;
@@ -7,14 +7,17 @@ using System.Linq;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Worlds;
+using Depra.Ecs.QoL.Components;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
 using Depra.Ecs.Worlds;
 using UnityEngine;
+using static Depra.Ecs.Hybrid.Module;
 
 namespace Depra.Ecs.Hybrid.Entities
 {
 	[DisallowMultipleComponent]
+	[AddComponentMenu(MENU_PATH + nameof(AuthoringEntity), DEFAULT_ORDER)]
 	public sealed class AuthoringEntity : MonoBehaviour, IAuthoringEntity
 	{
 		[SerializeField] internal DestructionMode _destructionMode;
@@ -26,7 +29,8 @@ namespace Depra.Ecs.Hybrid.Entities
 		{
 			if (BakingWorld.World != null && _processed == false)
 			{
-				BakingWorld.World.Pool<BakingEntityRef>().Allocate(BakingWorld.World.CreateEntity()).Value = gameObject;
+				BakingWorld.World.Pools.Get<BakingEntityRef>()
+					.Allocate(BakingWorld.World.CreateEntity()).Value = gameObject;
 			}
 		}
 
