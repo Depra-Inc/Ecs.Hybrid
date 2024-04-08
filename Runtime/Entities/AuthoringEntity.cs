@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Components;
-using Depra.Ecs.Hybrid.Worlds;
 using Depra.Ecs.QoL.Components;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
+using Depra.Ecs.Unity;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
@@ -27,11 +27,13 @@ namespace Depra.Ecs.Hybrid.Entities
 
 		private void OnEnable()
 		{
-			if (BakingWorld.World != null && _processed == false)
+			if (UnityWorlds.Connected == false || _processed)
 			{
-				BakingWorld.World.Pools.Get<BakingEntityRef>()
-					.Allocate(BakingWorld.World.CreateEntity()).Value = gameObject;
+				return;
 			}
+
+			var world = UnityWorlds.Instance.Default;
+			world.Pools.Get<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 		}
 
 		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()

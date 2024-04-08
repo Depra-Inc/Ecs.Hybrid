@@ -8,7 +8,9 @@ using Depra.Ecs.QoL.Components;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
+#if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace Depra.Ecs.Hybrid.Systems
 {

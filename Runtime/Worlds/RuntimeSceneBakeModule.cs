@@ -10,7 +10,7 @@ using Depra.Ecs.Systems;
 
 namespace Depra.Ecs.Hybrid.Worlds
 {
-	public readonly struct RuntimeSceneBaking : IModule
+	public readonly struct RuntimeSceneBakeModule : IModule
 	{
 		IEnumerable<IModule> IModule.Modules => Array.Empty<IModule>();
 
@@ -20,7 +20,6 @@ namespace Depra.Ecs.Hybrid.Worlds
 		};
 
 		void IModule.Initialize(ISystemGroup systems) => systems
-			.Add(new BakingServiceSystem())
 			.Add(new InitialBakingSystem())
 			.Add(new ContinuousBakingSystem());
 	}
