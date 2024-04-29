@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using Depra.Ecs.Entities;
 using Depra.Ecs.QoL.Components;
 using Depra.Ecs.Worlds;
-using Depra.Inspector.SerializedReference;
+using Depra.SerializeReference.Extensions;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
 
@@ -15,7 +15,9 @@ namespace Depra.Ecs.Hybrid.Components
 	[CreateAssetMenu(menuName = MENU_NAME, fileName = FILE_NAME, order = DEFAULT_ORDER)]
 	public sealed class ComponentDatabase : ScriptableObject
 	{
-		[SubtypeDropdown] [SerializeReference] private IComponent[] _components;
+		[SerializeReferenceDropdown]
+		[UnityEngine.SerializeReference]
+		private IComponent[] _components;
 
 		private const string FILE_NAME = nameof(ComponentDatabase);
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;

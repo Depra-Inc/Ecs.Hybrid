@@ -1,13 +1,13 @@
 {
 	"name": "com.depra.ecs.hybrid",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"displayName": "Depra.Ecs.Hybrid",
 	"description": "Unity Conversion Workflow for Depra.Ecs. Easy convert GameObjects to Entity.",
 	"unity": "2022.3",
 	"license": "Apache-2.0",
 	"dependencies": {
-		"com.depra.ecs.unity": "0.2.1",
-		"com.depra.inspector.unity.serialized-reference": "0.0.6"
+		"com.depra.ecs.unity": "0.2.6",
+		"com.depra.serialize-reference.extensions": "0.0.10"
 	},
 	"keywords": [
 		"depra",

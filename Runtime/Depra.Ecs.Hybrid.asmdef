@@ -3,7 +3,7 @@
     "rootNamespace": "Depra.Ecs.Hybrid",
     "references": [
         "GUID:d4d2d3673d7d2a146884ebf91bc9e015",
-        "GUID:5c3cbf54bce652248b5d0c693909f476"
+        "GUID:d4770dd4eaf4dc9469ce95e304152de6"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
