@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
+using System.Collections.Generic;
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.Worlds;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Depra.Ecs.Hybrid.Components
 	public sealed class AuthoringComponentDatabase : MonoBehaviour, IAuthoring
 	{
 		[SerializeField] private ComponentDatabase[] _components;
+
+		public IEnumerable<ComponentDatabase> Enumerate() => _components;
 
 		IBaker IAuthoring.CreateBaker() => new Baker(_components);
 

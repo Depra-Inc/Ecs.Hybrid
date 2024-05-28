@@ -39,6 +39,8 @@ namespace Depra.Ecs.Hybrid.Entities
 		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
 			.Where(x => ReferenceEquals(x, this) == false);
 
+		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
+
 		private void Initialize(PackedEntityWithWorld entity)
 		{
 			_entity = entity;
@@ -63,8 +65,6 @@ namespace Depra.Ecs.Hybrid.Entities
 		}
 
 		IBaker IAuthoring.CreateBaker() => new Backer();
-
-		bool IAuthoringEntity.Unpack(out Entity entity) => _entity.Unpack(out _, out entity);
 
 		private readonly struct Backer : IBaker
 		{

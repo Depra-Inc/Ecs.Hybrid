@@ -2,13 +2,11 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Entities;
-using Depra.Ecs.Hybrid.Components;
-using Depra.Ecs.Worlds;
 
 namespace Depra.Ecs.Hybrid.Entities
 {
-	public interface IAuthoringEntity : IAuthoring
+	public static class AuthoringEntityExtensions
 	{
-		bool Unpack(out World world, out Entity entity);
+		public static bool Unpack(this IAuthoringEntity self, out Entity entity) => self.Unpack(out _, out entity);
 	}
 }
