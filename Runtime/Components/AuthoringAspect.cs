@@ -1,6 +1,8 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
+using System;
+using System.Collections.Generic;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
@@ -12,18 +14,21 @@ namespace Depra.Ecs.Hybrid.Components
 	{
 		[SerializeField] private GameObject _scope;
 
-		IBaker IAuthoring.CreateBaker() => new Baker(_scope);
+		public IEnumerable<IAuthoring> Scoped => _scope
+			? _scope.GetComponents<IAuthoring>()
+			: Array.Empty<IAuthoring>();
+
+		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 		private readonly struct Baker : IBaker
 		{
-			private readonly GameObject _scope;
+			private readonly AuthoringAspect _aspect;
 
-			public Baker(GameObject scope) => _scope = scope;
+			public Baker(AuthoringAspect aspect) => _aspect = aspect;
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var components = _scope.GetComponents<IAuthoring>();
-				foreach (var component in components)
+				foreach (var component in _aspect.Scoped)
 				{
 					component.CreateBaker().Bake(authoring, world);
 					Destroy((Component) component);
