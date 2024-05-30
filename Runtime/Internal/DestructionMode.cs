@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Depra.Ecs.Hybrid.Entities
+namespace Depra.Ecs.Hybrid.Internal
 {
 	internal enum DestructionMode
 	{

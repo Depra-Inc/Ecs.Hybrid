@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Components;
-using Depra.Ecs.QoL.Components;
+using Depra.Ecs.Hybrid.Internal;
 using Depra.Ecs.QoL.Entities;
 using Depra.Ecs.QoL.Worlds;
 using Depra.Ecs.Unity;
@@ -33,7 +33,7 @@ namespace Depra.Ecs.Hybrid.Entities
 			}
 
 			var world = UnityWorlds.Instance.Default;
-			world.Pools.Get<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
+			world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 		}
 
 		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()

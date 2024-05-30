@@ -4,8 +4,8 @@
 using Depra.Ecs.Components;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Entities;
-using Depra.Ecs.QoL.Components;
 using Depra.Ecs.QoL.Entities;
+using Depra.Ecs.QoL.Worlds;
 using Depra.Ecs.Systems;
 using Depra.Ecs.Worlds;
 #if ENABLE_IL2CPP
@@ -26,19 +26,22 @@ namespace Depra.Ecs.Hybrid.Systems
 		void IPreInitializationSystem.PreInitialize(IWorldGroup worlds)
 		{
 			var world = worlds.Default;
-			_bakingEntities = world.Pools.Get<BakingEntityRef>();
+			_bakingEntities = world.Pool<BakingEntityRef>();
 			_entities = new EntityQuery(typeof(BakingEntityRef)).Initialize(world);
 		}
 
-		void IExecutionSystem.Execute(float frameTime) => _entities.ForEach(entity =>
+		void IExecutionSystem.Execute(float frameTime)
 		{
-			var bakingObject = _bakingEntities[entity].Value;
-			if (bakingObject && bakingObject.TryGetComponent(out IAuthoringEntity authoring))
+			foreach (var entity in _entities)
 			{
-				authoring.CreateBaker().Bake(authoring, _bakingEntities.World);
-			}
+				var bakingObject = _bakingEntities[entity].Value;
+				if (bakingObject && bakingObject.TryGetComponent(out IAuthoringEntity authoring))
+				{
+					authoring.CreateBaker().Bake(authoring, _bakingEntities.World);
+				}
 
-			_bakingEntities.World.DeleteEntity(entity);
-		});
+				_bakingEntities.World.DeleteEntity(entity);
+			}
+		}
 	}
 }
