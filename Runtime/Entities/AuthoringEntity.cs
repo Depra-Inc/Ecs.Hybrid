@@ -32,7 +32,7 @@ namespace Depra.Ecs.Hybrid.Entities
 				return;
 			}
 
-			var world = UnityWorlds.Instance.Default;
+			var world = UnityWorlds.Default;
 			world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
 		}
 
