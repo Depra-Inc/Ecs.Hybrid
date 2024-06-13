@@ -64,10 +64,14 @@ namespace Depra.Ecs.Hybrid.Entities
 			}
 		}
 
-		IBaker IAuthoring.CreateBaker() => new Backer();
+		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
 
 		private readonly struct Backer : IBaker
 		{
+			private readonly DestructionMode _destructionMode;
+
+			public Backer(DestructionMode destructionMode) => _destructionMode = destructionMode;
+
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 				var entity = world.CreateEntity();
@@ -77,7 +81,10 @@ namespace Depra.Ecs.Hybrid.Entities
 				foreach (var element in authoringEntity.Nested)
 				{
 					element.CreateBaker().Bake(authoringEntity, world);
-					Destroy((Component) element);
+					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
+					{
+						Destroy((Component) element);
+					}
 				}
 
 				authoringEntity.FinalizeConversion();
