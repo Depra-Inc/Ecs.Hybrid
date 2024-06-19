@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Depra.Ecs.Entities;
 using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Internal;
@@ -33,7 +34,8 @@ namespace Depra.Ecs.Hybrid.Entities
 			}
 
 			var world = UnityWorlds.Default;
-			world.Pool<BakingEntityRef>().Allocate(world.CreateEntity()).Value = gameObject;
+			var entity = world.CreateEntity();
+			world.Pool<BakingEntityRef>().Allocate(entity).Value = gameObject;
 		}
 
 		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
@@ -47,6 +49,7 @@ namespace Depra.Ecs.Hybrid.Entities
 			_processed = true;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void FinalizeConversion()
 		{
 			switch (_destructionMode)

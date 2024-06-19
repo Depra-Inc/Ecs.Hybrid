@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Depra.Ecs.Hybrid.Internal;
 using Depra.Ecs.Worlds;
 using UnityEngine;
@@ -26,6 +27,25 @@ namespace Depra.Ecs.Hybrid.Components
 			? _scope.GetComponents<IAuthoring>()
 			: Array.Empty<IAuthoring>();
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void FinalizeConversion()
+		{
+			switch (_destructionMode)
+			{
+				case DestructionMode.NONE:
+					break;
+				case DestructionMode.DESTROY_OBJECT:
+					Destroy(this);
+					Destroy(_scope);
+					break;
+				case DestructionMode.DESTROY_COMPONENT:
+					Destroy(this);
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+		}
+
 		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 		private readonly struct Baker : IBaker
@@ -45,25 +65,7 @@ namespace Depra.Ecs.Hybrid.Components
 					}
 				}
 
-				FinalizeConversion();
-			}
-
-			private void FinalizeConversion()
-			{
-				switch (_aspect._destructionMode)
-				{
-					case DestructionMode.NONE:
-						break;
-					case DestructionMode.DESTROY_OBJECT:
-						Destroy(_aspect);
-						Destroy(_aspect._scope);
-						break;
-					case DestructionMode.DESTROY_COMPONENT:
-						Destroy(_aspect);
-						break;
-					default:
-						throw new ArgumentOutOfRangeException();
-				}
+				_aspect.FinalizeConversion();
 			}
 		}
 	}
