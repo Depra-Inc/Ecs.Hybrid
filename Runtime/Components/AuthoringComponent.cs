@@ -3,6 +3,7 @@
 
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.QoL.Components;
+using Depra.Ecs.QoL.Worlds;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Depra.Ecs.Hybrid.Components
 			{
 				if (((IAuthoringEntity) authoring).Unpack(out var entity))
 				{
-					world.Pools.Get<TComponent>().Replace(entity, _component._value);
+					world.Pool<TComponent>().Replace(entity, _component._value);
 				}
 			}
 		}
