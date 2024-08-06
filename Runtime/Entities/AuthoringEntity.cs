@@ -77,8 +77,13 @@ namespace Depra.Ecs.Hybrid.Entities
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var entity = world.CreateEntity();
 				var authoringEntity = (AuthoringEntity) authoring;
+				if (authoringEntity._processed)
+				{
+					return;
+				}
+
+				var entity = world.CreateEntity();
 				authoringEntity.Initialize(world.PackEntityWithWorld(entity));
 
 				foreach (var element in authoringEntity.Nested)
