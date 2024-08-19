@@ -16,23 +16,30 @@ namespace Depra.Ecs.Hybrid.Components
 
 		public IEnumerable<ComponentDatabase> Enumerate() => _components;
 
-		IBaker IAuthoring.CreateBaker() => new Baker(_components);
+		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 		private readonly struct Baker : IBaker
 		{
-			private readonly ComponentDatabase[] _components;
+			private readonly AuthoringComponentDatabase _database;
 
-			public Baker(ComponentDatabase[] components) => _components = components;
+			public Baker(AuthoringComponentDatabase database) => _database = database;
 
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 				if (((IAuthoringEntity) authoring).Unpack(out var entity) == false)
 				{
+					Debug.LogWarning($"Failed to unpack entity from {nameof(GameObject)}.", _database);
 					return;
 				}
 
-				foreach (var component in _components)
+				foreach (var component in _database._components)
 				{
+					if (component == null)
+					{
+						Debug.LogWarning($"{nameof(ComponentDatabase)} is null.", _database);
+						continue;
+					}
+
 					component.Setup(world, entity);
 				}
 			}
