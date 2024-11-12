@@ -2,6 +2,7 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System;
+using System.Runtime.CompilerServices;
 using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.QoL.Components;
@@ -32,25 +33,30 @@ namespace Depra.Ecs.Hybrid
 			private readonly Type _componentType;
 			private readonly AuthoringComponent<TComponent> _component;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public Baker(AuthoringComponent<TComponent> component, Type componentType)
 			{
 				_component = component;
 				_componentType = componentType;
 			}
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (((IAuthoringEntity)authoring).Unpack(out var entity))
-				{
 #if ECS_DEBUG
-					if (!world.Pools.Contains(_componentType))
-					{
-						Debug.LogWarning("Component is not registered in the world", _component);
-						return;
-					}
-#endif
-					world.Pools[_componentType].Replace(entity, _component._value);
+				if (!((IAuthoringEntity)authoring).Unpack(out var entity))
+				{
+					Debug.LogWarning($"Failed to unpack entity from '{_component.name}'", _component);
+					return;
 				}
+
+				if (!world.Pools.Contains(_componentType))
+				{
+					Debug.LogWarning("Component is not registered in the world", _component);
+					return;
+				}
+#endif
+				world.Pools[_componentType].Replace(entity, _component._value);
 			}
 		}
 	}

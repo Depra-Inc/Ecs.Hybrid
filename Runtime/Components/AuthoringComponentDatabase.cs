@@ -2,6 +2,7 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Entities;
 using Depra.Ecs.Worlds;
@@ -22,9 +23,11 @@ namespace Depra.Ecs.Hybrid
 	{
 		[SerializeField] private ComponentDatabase[] _components;
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public IEnumerable<ComponentDatabase> Enumerate() => _components;
 
-		IBaker IAuthoring.CreateBaker() => new Baker(this);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		IBaker IAuthoring.CreateBaker() => new Baker(this, name);
 
 #if ENABLE_IL2CPP
 		[Il2CppSetOption(Option.NullChecks, false)]
@@ -32,16 +35,23 @@ namespace Depra.Ecs.Hybrid
 #endif
 		private readonly struct Baker : IBaker
 		{
+			private readonly string _ownerName;
 			private readonly AuthoringComponentDatabase _database;
 
-			public Baker(AuthoringComponentDatabase database) => _database = database;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Baker(AuthoringComponentDatabase database, string ownerName)
+			{
+				_database = database;
+				_ownerName = ownerName;
+			}
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 #if ECS_DEBUG
 				if (((IAuthoringEntity)authoring).Unpack(out var entity) == false)
 				{
-					Debug.LogWarning($"Failed to unpack entity from {nameof(GameObject)}.", _database);
+					Debug.LogWarning($"Failed to unpack entity from '{_ownerName}'", _database);
 					return;
 				}
 #endif

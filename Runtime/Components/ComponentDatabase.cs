@@ -1,7 +1,6 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -71,10 +70,26 @@ namespace Depra.Ecs.Hybrid
 				return;
 			}
 
-			var result = _components.ToList();
-			result.AddRange(_oldComponents);
-			_components = result.ToArray();
-			_oldComponents = Array.Empty<IComponent>();
+			var validComponents = _components.ToList();
+			var obsoleteComponents = new List<object>(_oldComponents);
+			foreach (var obsoleteReference in _oldComponents)
+			{
+				if (obsoleteReference == null)
+				{
+					continue;
+				}
+
+				var referenceType = obsoleteReference.GetType();
+				var filtered = ComponentSerializeReference.Filter(referenceType.FullName);
+				if (filtered.Contains(referenceType))
+				{
+					validComponents.Add(obsoleteReference);
+					obsoleteComponents.Remove(obsoleteReference);
+				}
+			}
+
+			_components = validComponents.ToArray();
+			_oldComponents = obsoleteComponents.Cast<IComponent>().ToArray();
 		}
 	}
 }
