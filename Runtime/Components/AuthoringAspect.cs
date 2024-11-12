@@ -4,13 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Internal;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
 
-namespace Depra.Ecs.Hybrid.Components
+namespace Depra.Ecs.Hybrid
 {
+#if ENABLE_IL2CPP
+	[Il2CppSetOption(Option.NullChecks, false)]
+	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 	[AddComponentMenu(MENU_PATH + nameof(AuthoringAspect), DEFAULT_ORDER)]
 	public sealed class AuthoringAspect : MonoBehaviour, IAuthoring
 	{
@@ -61,7 +69,7 @@ namespace Depra.Ecs.Hybrid.Components
 					component.CreateBaker().Bake(authoring, world);
 					if (_aspect._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Destroy((Component) component);
+						Destroy((Component)component);
 					}
 				}
 

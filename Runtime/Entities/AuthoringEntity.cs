@@ -14,10 +14,17 @@ using Depra.Ecs.Unity;
 using Depra.Ecs.Worlds;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace Depra.Ecs.Hybrid.Entities
 {
 	[DisallowMultipleComponent]
+#if ENABLE_IL2CPP
+	[Il2CppSetOption(Option.NullChecks, false)]
+	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 	[AddComponentMenu(MENU_PATH + nameof(AuthoringEntity), DEFAULT_ORDER)]
 	public sealed class AuthoringEntity : MonoBehaviour, IAuthoringEntity
 	{
@@ -69,12 +76,17 @@ namespace Depra.Ecs.Hybrid.Entities
 
 		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
 
+#if ENABLE_IL2CPP
+		[Il2CppSetOption(Option.NullChecks, false)]
+		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 		private readonly struct Backer : IBaker
 		{
 			private readonly DestructionMode _destructionMode;
 
 			public Backer(DestructionMode destructionMode) => _destructionMode = destructionMode;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
 				var authoringEntity = (AuthoringEntity) authoring;

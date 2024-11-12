@@ -2,6 +2,7 @@
 
 using System;
 
+// ReSharper disable all
 namespace Unity.IL2CPP.CompilerServices
 {
 	/// <summary>
@@ -17,21 +18,17 @@ namespace Unity.IL2CPP.CompilerServices
 	/// }
 	/// </code>
 	/// </summary>
-	[AttributeUsage(VALID_TARGETS, Inherited = false, AllowMultiple = true)]
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
 	internal sealed class Il2CppSetOptionAttribute : Attribute
 	{
-		private const AttributeTargets VALID_TARGETS =
-			AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property;
-
 		public Il2CppSetOptionAttribute(Option option, object value)
 		{
-			Option = option;
 			Value = value;
+			Option = option;
 		}
 
-		public Option Option { get; private set; }
-
 		public object Value { get; private set; }
+		public Option Option { get; private set; }
 	}
 
 	/// <summary>
