@@ -56,6 +56,10 @@ namespace Depra.Ecs.Hybrid
 
 		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
+#if ENABLE_IL2CPP
+		[Il2CppSetOption(Option.NullChecks, false)]
+		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 		private readonly struct Baker : IBaker
 		{
 			private readonly AuthoringAspect _aspect;

@@ -3,7 +3,6 @@
 
 using System.Runtime.CompilerServices;
 using Depra.Ecs.Entities;
-using Depra.Ecs.Hybrid.Entities;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif

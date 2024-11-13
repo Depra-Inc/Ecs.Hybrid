@@ -2,14 +2,10 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Depra.Ecs.Entities;
-using Depra.Ecs.QoL.Components;
 using Depra.Ecs.Worlds;
-using Depra.SerializeReference.Extensions;
 using UnityEngine;
-using UnityEngine.Serialization;
 using static Depra.Ecs.Hybrid.Module;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
@@ -27,12 +23,6 @@ namespace Depra.Ecs.Hybrid
 		[UnityEngine.SerializeReference]
 		[ComponentSerializeReference(nameof(Ecs))]
 		private object[] _components;
-
-		[HideInInspector]
-		[SerializeReferenceDropdown]
-		[UnityEngine.SerializeReference]
-		[FormerlySerializedAs("_components")]
-		private IComponent[] _oldComponents;
 
 		private const string FILE_NAME = nameof(ComponentDatabase);
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;
@@ -61,35 +51,6 @@ namespace Depra.Ecs.Hybrid
 #endif
 				world.Pools[componentType].Allocate(entity, component);
 			}
-		}
-
-		private void OnValidate()
-		{
-			if (_oldComponents is not { Length: > 0 })
-			{
-				return;
-			}
-
-			var validComponents = _components.ToList();
-			var obsoleteComponents = new List<object>(_oldComponents);
-			foreach (var obsoleteReference in _oldComponents)
-			{
-				if (obsoleteReference == null)
-				{
-					continue;
-				}
-
-				var referenceType = obsoleteReference.GetType();
-				var filtered = ComponentSerializeReference.Filter(referenceType.FullName);
-				if (filtered.Contains(referenceType))
-				{
-					validComponents.Add(obsoleteReference);
-					obsoleteComponents.Remove(obsoleteReference);
-				}
-			}
-
-			_components = validComponents.ToArray();
-			_oldComponents = obsoleteComponents.Cast<IComponent>().ToArray();
 		}
 	}
 }
