@@ -48,13 +48,14 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-#if ECS_DEBUG
 				if (((IAuthoringEntity)authoring).Unpack(out var entity) == false)
 				{
+#if ECS_DEBUG
 					Debug.LogWarning($"Failed to unpack entity from '{_ownerName}'", _database);
+#endif
 					return;
 				}
-#endif
+
 				foreach (var component in _database._components)
 				{
 #if ECS_DEBUG

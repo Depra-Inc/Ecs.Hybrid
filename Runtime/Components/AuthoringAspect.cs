@@ -70,6 +70,13 @@ namespace Depra.Ecs.Hybrid
 			{
 				foreach (var component in _aspect.Scoped)
 				{
+#if ECS_DEBUG
+					if (component == null)
+					{
+						Debug.LogWarning("Component is null.", _aspect);
+						continue;
+					}
+#endif
 					component.CreateBaker().Bake(authoring, world);
 					if (_aspect._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{

@@ -43,13 +43,14 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-#if ECS_DEBUG
 				if (!((IAuthoringEntity)authoring).Unpack(out var entity))
 				{
+#if ECS_DEBUG
 					Debug.LogWarning($"Failed to unpack entity from '{_component.name}'", _component);
+#endif
 					return;
 				}
-
+#if ECS_DEBUG
 				if (!world.Pools.Contains(_componentType))
 				{
 					Debug.LogWarning("Component is not registered in the world", _component);
