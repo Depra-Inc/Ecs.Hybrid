@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 using Unity.IL2CPP.CompilerServices;
 #endif
 
-namespace Depra.Ecs.Hybrid.Systems
+namespace Depra.Ecs.Hybrid
 {
 #if ENABLE_IL2CPP
 	[Il2CppSetOption(Option.NullChecks, false)]
@@ -31,8 +31,9 @@ namespace Depra.Ecs.Hybrid.Systems
 					.SelectMany(gameObject => gameObject.GetComponentsInChildren<T>(includeInactive))
 					.Reverse();
 			}
-
+#if ECS_DEBUG
 			Debug.LogWarning("No valid active scene found.");
+#endif
 			return Enumerable.Empty<T>();
 		}
 

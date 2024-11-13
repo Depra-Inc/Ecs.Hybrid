@@ -12,7 +12,7 @@ using Depra.Ecs.Worlds;
 using Unity.IL2CPP.CompilerServices;
 #endif
 
-namespace Depra.Ecs.Hybrid.Systems
+namespace Depra.Ecs.Hybrid
 {
 #if ENABLE_IL2CPP
 	[Il2CppSetOption(Option.NullChecks, false)]

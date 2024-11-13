@@ -2,10 +2,16 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Components;
-using Depra.Ecs.Hybrid.Entities;
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
 
-namespace Depra.Ecs.Hybrid.Worlds
+namespace Depra.Ecs.Hybrid
 {
+#if ENABLE_IL2CPP
+	[Il2CppSetOption(Option.NullChecks, false)]
+	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 	public sealed class SceneBakingAspect : IComponentAspect
 	{
 		void IComponentAspect.Initialize(AspectGroup aspects, ComponentPoolGroup pools)

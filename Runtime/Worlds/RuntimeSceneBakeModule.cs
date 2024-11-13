@@ -1,23 +1,23 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
-using System;
 using System.Collections.Generic;
 using Depra.Ecs.Components;
-using Depra.Ecs.Hybrid.Systems;
 using Depra.Ecs.Modular;
 using Depra.Ecs.Systems;
+#if ENABLE_IL2CPP
+using Unity.IL2CPP.CompilerServices;
+#endif
 
-namespace Depra.Ecs.Hybrid.Worlds
+namespace Depra.Ecs.Hybrid
 {
+#if ENABLE_IL2CPP
+	[Il2CppSetOption(Option.NullChecks, false)]
+	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 	public sealed class RuntimeSceneBakeModule : IModule
 	{
-		IEnumerable<IModule> IModule.Modules => Array.Empty<IModule>();
-
-		IEnumerable<IComponentAspect> IModule.Aspects => new IComponentAspect[]
-		{
-			new SceneBakingAspect()
-		};
+		IEnumerable<IComponentAspect> IModule.Aspects => new[] { new SceneBakingAspect() };
 
 		void IModule.Initialize(ISystemGroup systems) => systems
 			.Add(new InitialBakingSystem())
