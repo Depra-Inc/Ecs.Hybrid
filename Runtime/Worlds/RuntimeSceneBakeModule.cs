@@ -2,7 +2,7 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System.Collections.Generic;
-using Depra.Ecs.Modular;
+using Depra.Ecs.Modules;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif

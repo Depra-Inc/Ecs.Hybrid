@@ -12,7 +12,7 @@
     "precompiledReferences": [
         "Depra.Ecs.dll",
         "Depra.Ecs.QoL.dll",
-        "Depra.Ecs.Modular.dll"
+        "Depra.Ecs.Modules.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
