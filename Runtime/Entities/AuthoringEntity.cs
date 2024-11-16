@@ -5,20 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Depra.Ecs.Entities;
-using Depra.Ecs.Hybrid.Components;
 using Depra.Ecs.Hybrid.Internal;
-using Depra.Ecs.QoL.Entities;
-using Depra.Ecs.QoL.Worlds;
+using Depra.Ecs.QoL;
 using Depra.Ecs.Unity;
-using Depra.Ecs.Worlds;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.Module;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif
 
-namespace Depra.Ecs.Hybrid.Entities
+namespace Depra.Ecs.Hybrid
 {
 	[DisallowMultipleComponent]
 #if ENABLE_IL2CPP

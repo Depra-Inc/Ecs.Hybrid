@@ -2,12 +2,11 @@
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System.Runtime.CompilerServices;
-using Depra.Ecs.Entities;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif
 
-namespace Depra.Ecs.Hybrid.Entities
+namespace Depra.Ecs.Hybrid
 {
 #if ENABLE_IL2CPP
 	[Il2CppSetOption(Option.NullChecks, false)]

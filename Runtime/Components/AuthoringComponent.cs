@@ -3,10 +3,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Depra.Ecs.Hybrid.Components;
-using Depra.Ecs.Hybrid.Entities;
-using Depra.Ecs.QoL.Components;
-using Depra.Ecs.Worlds;
+using Depra.Ecs.QoL;
 using UnityEngine;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;

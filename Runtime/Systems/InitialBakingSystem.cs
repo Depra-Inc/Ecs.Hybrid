@@ -3,9 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Depra.Ecs.Hybrid.Entities;
-using Depra.Ecs.Systems;
-using Depra.Ecs.Worlds;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 #if ENABLE_IL2CPP
