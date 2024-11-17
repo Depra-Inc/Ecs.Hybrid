@@ -1,7 +1,6 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
 
-using System.Collections.Generic;
 using Depra.Ecs.Modules;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
@@ -15,7 +14,10 @@ namespace Depra.Ecs.Hybrid
 #endif
 	public sealed class RuntimeSceneBakeModule : IModule
 	{
-		IEnumerable<IComponentAspect> IModule.Aspects => new[] { new SceneBakingAspect() };
+		IComponentAspect[] IModule.Aspects => new IComponentAspect[]
+		{
+			new SceneBakingAspect()
+		};
 
 		void IModule.Initialize(ISystemGroup systems) => systems
 			.Add(new InitialBakingSystem())
