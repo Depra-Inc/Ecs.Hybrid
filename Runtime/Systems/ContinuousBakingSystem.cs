@@ -24,7 +24,7 @@ namespace Depra.Ecs.Hybrid
 			_entities = new EntityQuery(typeof(BakingEntityRef)).Initialize(world);
 		}
 
-		void IExecutionSystem.Execute(float frameTime)
+		void IExecutionSystem.Execute()
 		{
 			foreach (var entity in _entities)
 			{
