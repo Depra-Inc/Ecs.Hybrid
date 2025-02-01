@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Depra.Ecs.Hybrid.Internal;
 using Depra.Ecs.QoL;
 using Depra.Ecs.Unity;
 using UnityEngine;
-using static Depra.Ecs.Hybrid.Module;
+using static Depra.Ecs.Hybrid.RuntimeSceneBakeModule;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif
@@ -31,7 +31,7 @@ namespace Depra.Ecs.Hybrid
 
 		private void OnEnable()
 		{
-			if (UnityWorlds.Connected == false || _processed)
+			if (!UnityWorlds.Connected || _processed)
 			{
 				return;
 			}
@@ -42,7 +42,7 @@ namespace Depra.Ecs.Hybrid
 		}
 
 		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
-			.Where(x => ReferenceEquals(x, this) == false);
+			.Where(x => !ReferenceEquals(x, this));
 
 		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
@@ -85,7 +85,7 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var authoringEntity = (AuthoringEntity) authoring;
+				var authoringEntity = (AuthoringEntity)authoring;
 				if (authoringEntity._processed)
 				{
 					return;
@@ -99,7 +99,7 @@ namespace Depra.Ecs.Hybrid
 					element.CreateBaker().Bake(authoringEntity, world);
 					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Destroy((Component) element);
+						Destroy((Component)element);
 					}
 				}
 
