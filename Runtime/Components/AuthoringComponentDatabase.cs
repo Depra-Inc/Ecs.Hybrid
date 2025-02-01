@@ -1,10 +1,10 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using static Depra.Ecs.Hybrid.Module;
+using static Depra.Ecs.Hybrid.RuntimeSceneBakeModule;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif

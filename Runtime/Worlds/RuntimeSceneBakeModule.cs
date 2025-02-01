@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Modules;
 #if ENABLE_IL2CPP
@@ -14,13 +14,17 @@ namespace Depra.Ecs.Hybrid
 #endif
 	public sealed class RuntimeSceneBakeModule : IModule
 	{
+		public const int DEFAULT_ORDER = 52;
+		public const string MENU_PATH = nameof(Ecs) + "/" + nameof(Hybrid) + "/";
+
 		IComponentAspect[] IModule.Aspects => new IComponentAspect[]
 		{
 			new SceneBakingAspect()
 		};
 
 		void IModule.Initialize(ISystemGroup systems) => systems
-			.Add(new InitialBakingSystem())
-			.Add(new ContinuousBakingSystem());
+			.Add(new InitialEntityBakingSystem())
+			.Add(new InitialBehaviourBakingSystem())
+			.Add(new ContinuousEntityBakingSystem());
 	}
 }
