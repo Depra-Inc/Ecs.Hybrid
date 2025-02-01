@@ -2,7 +2,9 @@
 // © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
 
 using Depra.Ecs.Hybrid.Internal;
+#if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
+#endif
 
 namespace Depra.Ecs.Hybrid
 {
