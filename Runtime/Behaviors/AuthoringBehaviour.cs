@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using UnityEngine;
 #if ENABLE_IL2CPP
@@ -14,6 +14,8 @@ namespace Depra.Ecs.Hybrid
 #endif
 	public abstract class AuthoringBehaviour : MonoBehaviour, IAuthoring
 	{
+		[field: SerializeField] public string WorldName { get; private set; }
+
 		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 		protected abstract void Bake(World world);

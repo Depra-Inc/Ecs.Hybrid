@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using Depra.Ecs.Hybrid.Internal;
 #if ENABLE_IL2CPP
@@ -16,9 +16,13 @@ namespace Depra.Ecs.Hybrid
 	{
 		void IPreInitializationSystem.PreInitialize(IWorldGroup worlds)
 		{
-			foreach (IAuthoring authoringBehaviour in SceneUtility.FindOnActiveScene<AuthoringBehaviour>())
+			foreach (var authoringBehaviour in SceneUtility.FindOnActiveScene<AuthoringBehaviour>())
 			{
-				authoringBehaviour.CreateBaker().Bake(authoringBehaviour, worlds.Default);
+				((IAuthoring)authoringBehaviour)
+					.CreateBaker()
+					.Bake(authoringBehaviour, string.IsNullOrEmpty(authoringBehaviour.WorldName)
+						? worlds.Default
+						: worlds.Select(authoringBehaviour.WorldName));
 			}
 		}
 	}
