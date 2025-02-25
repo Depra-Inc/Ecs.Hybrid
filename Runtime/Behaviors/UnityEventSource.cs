@@ -20,14 +20,14 @@ namespace Depra.Ecs.Unity
 	{
 		[SerializeField] private string _senderName;
 
-		private World _world;
 		public UnityEventSender Sender => new(_senderName, gameObject);
+		protected World World { get; private set; }
 
-		protected override void Bake(World world) => _world = world;
+		protected override void Bake(World world) => World = world;
 
-		protected virtual bool Validate() => _world != null;
+		protected virtual bool Validate() => World != null;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected virtual PackedEntityWithWorld CreateEntity() => _world.PackEntityWithWorld(_world.CreateEntity());
+		protected virtual PackedEntityWithWorld CreateEntity() => World.PackEntityWithWorld(World.CreateEntity());
 	}
 }
