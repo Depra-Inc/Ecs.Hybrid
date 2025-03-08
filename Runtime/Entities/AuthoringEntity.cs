@@ -1,9 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Depra.Ecs.Hybrid.Internal;
 using Depra.Ecs.QoL;
@@ -41,10 +39,11 @@ namespace Depra.Ecs.Hybrid
 			world.Pool<BakingEntityRef>().Allocate(entity).Value = gameObject;
 		}
 
-		public IEnumerable<IAuthoring> Nested => GetComponents<IAuthoring>()
-			.Where(x => !ReferenceEquals(x, this));
+		public IAuthoringAccess GetNested() => new AuthoringNestedAccess(this);
 
 		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
+
+		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
 
 		private void Initialize(PackedEntityWithWorld entity)
 		{
@@ -70,8 +69,6 @@ namespace Depra.Ecs.Hybrid
 			}
 		}
 
-		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
-
 #if ENABLE_IL2CPP
 		[Il2CppSetOption(Option.NullChecks, false)]
 		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -94,7 +91,8 @@ namespace Depra.Ecs.Hybrid
 				var entity = world.CreateEntity();
 				authoringEntity.Initialize(world.PackEntityWithWorld(entity));
 
-				foreach (var element in authoringEntity.Nested)
+				using var nested = authoringEntity.GetNested();
+				foreach (var element in nested.Enumerate())
 				{
 					element.CreateBaker().Bake(authoringEntity, world);
 					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
