@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -24,7 +24,7 @@ namespace Depra.Ecs.Hybrid
 		public IEnumerable<ComponentDatabase> Enumerate() => _components;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		IBaker IAuthoring.CreateBaker() => new Baker(this, name);
+		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 #if ENABLE_IL2CPP
 		[Il2CppSetOption(Option.NullChecks, false)]
@@ -32,15 +32,10 @@ namespace Depra.Ecs.Hybrid
 #endif
 		private readonly struct Baker : IBaker
 		{
-			private readonly string _ownerName;
 			private readonly AuthoringComponentDatabase _database;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Baker(AuthoringComponentDatabase database, string ownerName)
-			{
-				_database = database;
-				_ownerName = ownerName;
-			}
+			public Baker(AuthoringComponentDatabase database) => _database = database;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
@@ -48,7 +43,7 @@ namespace Depra.Ecs.Hybrid
 				if (((IAuthoringEntity)authoring).Unpack(out var entity) == false)
 				{
 #if ECS_DEBUG
-					Debug.LogWarning($"Failed to unpack entity from '{_ownerName}'", _database);
+					Debug.LogWarning($"Failed to unpack entity from '{_database.name}'", _database);
 #endif
 					return;
 				}
