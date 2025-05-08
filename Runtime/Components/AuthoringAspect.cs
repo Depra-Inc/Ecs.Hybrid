@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using System;
 using System.Collections.Generic;
@@ -23,11 +23,16 @@ namespace Depra.Ecs.Hybrid
 		[Tooltip("GameObjects with IAuthoring components to be baked.")]
 		[SerializeField] private GameObject _scope;
 
+		[UnityEngine.SerializeReference]
+		[ComponentSerializeReference(nameof(Ecs))]
+		private object[] _components;
+
 		[Tooltip("What to do with the scope after baking.\n" +
 		         "None - do nothing,\n" +
 		         "Destroy Object - destroy this component and the scope,\n" +
 		         "Destroy Component - destroy this components and all IAuthoring components on the scope.")]
-		[SerializeField] private DestructionMode _destructionMode;
+		[SerializeField]
+		private DestructionMode _destructionMode;
 
 		public IEnumerable<IAuthoring> Scoped => _scope
 			? _scope.GetComponents<IAuthoring>()
@@ -48,7 +53,8 @@ namespace Depra.Ecs.Hybrid
 					Destroy(this);
 					break;
 				default:
-					throw new ArgumentOutOfRangeException();
+					Debug.LogException(new ArgumentOutOfRangeException());
+					break;
 			}
 		}
 
@@ -80,6 +86,34 @@ namespace Depra.Ecs.Hybrid
 					{
 						Destroy((Component)component);
 					}
+				}
+
+				if (!((IAuthoringEntity)authoring).Unpack(out var entity))
+				{
+#if ECS_DEBUG
+					Debug.LogWarning($"Failed to unpack entity from '{_aspect.name}'", _aspect);
+#endif
+					return;
+				}
+
+				foreach (var component in _aspect._components)
+				{
+#if ECS_DEBUG
+					if (component == null)
+					{
+						Debug.LogWarning("Component is null", _aspect);
+						continue;
+					}
+#endif
+					var componentType = component.GetType();
+#if ECS_DEBUG
+					if (!world.Pools.Contains(componentType))
+					{
+						Debug.LogWarning($"Component pool for {componentType} is not found", _aspect);
+						continue;
+					}
+#endif
+					world.Pools[componentType].Allocate(entity, component);
 				}
 
 				_aspect.FinalizeConversion();
