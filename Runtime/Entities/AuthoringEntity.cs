@@ -43,8 +43,9 @@ namespace Depra.Ecs.Hybrid
 
 		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
-		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
+		IBaker IAuthoring.CreateBaker() => new Backer(this, _destructionMode);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Initialize(PackedEntityWithWorld entity)
 		{
 			_entity = entity;
@@ -75,33 +76,40 @@ namespace Depra.Ecs.Hybrid
 #endif
 		private readonly struct Backer : IBaker
 		{
+			private readonly AuthoringEntity _authoringEntity;
 			private readonly DestructionMode _destructionMode;
 
-			public Backer(DestructionMode destructionMode) => _destructionMode = destructionMode;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Backer(AuthoringEntity authoringEntity, DestructionMode destructionMode)
+			{
+				_authoringEntity = authoringEntity;
+				_destructionMode = destructionMode;
+			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			void IBaker.Bake(IAuthoring authoring, World world)
+			public void Bake(Entity entity, World world)
 			{
-				var authoringEntity = (AuthoringEntity)authoring;
-				if (authoringEntity._processed)
-				{
-					return;
-				}
-
-				var entity = world.CreateEntity();
-				authoringEntity.Initialize(world.PackEntityWithWorld(entity));
-
-				using var nested = authoringEntity.GetNested();
+				_authoringEntity.Initialize(world.PackEntityWithWorld(entity));
+				using var nested = _authoringEntity.GetNested();
 				foreach (var element in nested.Enumerate())
 				{
-					element.CreateBaker().Bake(authoringEntity, world);
+					element.CreateBaker().Bake(_authoringEntity, world);
 					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
 						Destroy((Component)element);
 					}
 				}
 
-				authoringEntity.FinalizeConversion();
+				_authoringEntity.FinalizeConversion();
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			void IBaker.Bake(IAuthoring authoring, World world)
+			{
+				if (!_authoringEntity._processed)
+				{
+					Bake(world.CreateEntity(), world);
+				}
 			}
 		}
 	}
