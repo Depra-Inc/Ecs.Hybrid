@@ -94,12 +94,12 @@ namespace Depra.Ecs.Hybrid
 				_component.Initialize(packedEntity);
 
 				using var access = _component.GetNested();
-				foreach (var nested in access.Enumerate())
+				foreach (var element in access.Enumerate())
 				{
-					nested.CreateBaker().Bake(_component, world);
+					element.CreateBaker().Bake(_component, world);
 					if (_component._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Destroy((Component)authoring);
+						Destroy((Component)element);
 					}
 				}
 
