@@ -17,6 +17,31 @@ namespace Depra.Ecs.Hybrid
 #endif
 	public readonly struct EntityBinding : IAuthoringEntity
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Bind(World world, Entity entity, GameObject gameObject,
+			DestructionMode destructionMode = DestructionMode.NONE)
+		{
+			if (world.IsEntityNotAlive(entity))
+			{
+				return;
+			}
+
+			var packedEntity = world.PackEntityWithWorld(entity);
+			IAuthoringEntity authoring = new EntityBinding(packedEntity, gameObject, destructionMode);
+			authoring.CreateBaker().Bake(authoring, world);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Bind(PackedEntityWithWorld entity, GameObject gameObject,
+			DestructionMode destructionMode = DestructionMode.NONE)
+		{
+			if (entity.Unpack(out var world, out _))
+			{
+				IAuthoringEntity authoring = new EntityBinding(entity, gameObject, destructionMode);
+				authoring.CreateBaker().Bake(authoring, world);
+			}
+		}
+
 		private readonly GameObject _gameObject;
 		private readonly PackedEntityWithWorld _entity;
 		private readonly DestructionMode _destructionMode;
@@ -30,8 +55,7 @@ namespace Depra.Ecs.Hybrid
 			_destructionMode = destructionMode;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public IBaker CreateBaker() => new Baker(this);
+		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
 		bool IAuthoringEntity.Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
@@ -44,28 +68,25 @@ namespace Depra.Ecs.Hybrid
 			private readonly EntityBinding _binding;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Baker(EntityBinding binding) => _binding = binding;
+			internal Baker(EntityBinding binding) => _binding = binding;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public void Bake()
+			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_binding._entity.Unpack(out var world, out _))
+				if (_binding._entity.Unpack(out world, out _))
 				{
 					return;
 				}
 
-				foreach (var authoring in _binding._gameObject.GetComponents<IAuthoring>())
+				foreach (var nestedAuthoring in _binding._gameObject.GetComponents<IAuthoring>())
 				{
-					authoring.CreateBaker().Bake(_binding, world);
+					nestedAuthoring.CreateBaker().Bake(_binding, world);
 					if (_binding._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Object.Destroy((Component)authoring);
+						Object.Destroy((Component)nestedAuthoring);
 					}
 				}
 			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			void IBaker.Bake(IAuthoring authoring, World world) => Bake();
 		}
 	}
 }
