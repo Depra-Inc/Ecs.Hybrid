@@ -15,14 +15,14 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	public readonly struct AuthoringEntityWrapper : IAuthoringEntity
+	public readonly struct EntityBinding : IAuthoringEntity
 	{
 		private readonly GameObject _gameObject;
 		private readonly PackedEntityWithWorld _entity;
 		private readonly DestructionMode _destructionMode;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public AuthoringEntityWrapper(PackedEntityWithWorld entity, GameObject gameObject,
+		public EntityBinding(PackedEntityWithWorld entity, GameObject gameObject,
 			DestructionMode destructionMode = DestructionMode.NONE)
 		{
 			_entity = entity;
@@ -40,23 +40,23 @@ namespace Depra.Ecs.Hybrid
 #endif
 		private readonly struct Baker : IBaker
 		{
-			private readonly AuthoringEntityWrapper _wrapper;
+			private readonly EntityBinding _binding;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Baker(AuthoringEntityWrapper wrapper) => _wrapper = wrapper;
+			public Baker(EntityBinding binding) => _binding = binding;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_wrapper._entity.Unpack(out world, out _))
+				if (_binding._entity.Unpack(out world, out _))
 				{
 					return;
 				}
 
-				foreach (var nested in _wrapper._gameObject.GetComponents<IAuthoring>())
+				foreach (var nested in _binding._gameObject.GetComponents<IAuthoring>())
 				{
-					nested.CreateBaker().Bake(_wrapper, world);
-					if (_wrapper._destructionMode == DestructionMode.DESTROY_COMPONENT)
+					nested.CreateBaker().Bake(_binding, world);
+					if (_binding._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
 						Object.Destroy((Component)authoring);
 					}
