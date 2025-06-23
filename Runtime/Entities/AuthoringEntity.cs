@@ -74,7 +74,7 @@ namespace Depra.Ecs.Hybrid
 		[Il2CppSetOption(Option.NullChecks, false)]
 		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-		private readonly struct Backer : IBaker
+		public readonly struct Backer : IBaker
 		{
 			private readonly AuthoringEntity _authoringEntity;
 			private readonly DestructionMode _destructionMode;
