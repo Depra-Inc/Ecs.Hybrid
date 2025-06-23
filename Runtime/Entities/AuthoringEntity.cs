@@ -74,43 +74,36 @@ namespace Depra.Ecs.Hybrid
 		[Il2CppSetOption(Option.NullChecks, false)]
 		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-		public readonly struct Backer : IBaker
+		private readonly struct Backer : IBaker
 		{
-			private readonly AuthoringEntity _authoringEntity;
+			private readonly AuthoringEntity _component;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Backer(AuthoringEntity authoringEntity) => _authoringEntity = authoringEntity;
-
-			private DestructionMode DestructionMode
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => _authoringEntity._destructionMode;
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public void Bake(Entity entity, World world)
-			{
-				_authoringEntity.Initialize(world.PackEntityWithWorld(entity));
-				using var nested = _authoringEntity.GetNested();
-				foreach (var element in nested.Enumerate())
-				{
-					element.CreateBaker().Bake(_authoringEntity, world);
-					if (DestructionMode == DestructionMode.DESTROY_COMPONENT)
-					{
-						Destroy((Component)element);
-					}
-				}
-
-				_authoringEntity.FinalizeConversion();
-			}
+			public Backer(AuthoringEntity component) => _component = component;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (!_authoringEntity._processed)
+				if (_component._processed)
 				{
-					Bake(world.CreateEntity(), world);
+					return;
 				}
+
+				var entity = world.CreateEntity();
+				var packedEntity = world.PackEntityWithWorld(entity);
+				_component.Initialize(packedEntity);
+
+				using var access = _component.GetNested();
+				foreach (var nested in access.Enumerate())
+				{
+					nested.CreateBaker().Bake(_component, world);
+					if (_component._destructionMode == DestructionMode.DESTROY_COMPONENT)
+					{
+						Destroy((Component)authoring);
+					}
+				}
+
+				_component.FinalizeConversion();
 			}
 		}
 	}
