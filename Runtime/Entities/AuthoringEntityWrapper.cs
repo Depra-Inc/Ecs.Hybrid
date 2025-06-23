@@ -15,19 +15,16 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	public sealed class AuthoringEntityWrapper : IAuthoringEntity
+	public readonly struct AuthoringEntityWrapper : IAuthoringEntity
 	{
-		private readonly PackedEntity _entity;
 		private readonly GameObject _gameObject;
+		private readonly PackedEntityWithWorld _entity;
 		private readonly DestructionMode _destructionMode;
 
-		private World _world;
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public AuthoringEntityWrapper(PackedEntity entity, GameObject gameObject,
+		public AuthoringEntityWrapper(PackedEntityWithWorld entity, GameObject gameObject,
 			DestructionMode destructionMode = DestructionMode.NONE)
 		{
-			_world = null;
 			_entity = entity;
 			_gameObject = gameObject;
 			_destructionMode = destructionMode;
@@ -35,11 +32,7 @@ namespace Depra.Ecs.Hybrid
 
 		IBaker IAuthoring.CreateBaker() => new Baker(this);
 
-		bool IAuthoringEntity.Unpack(out World world, out Entity entity)
-		{
-			world = _world;
-			return _entity.Unpack(_world, out entity);
-		}
+		bool IAuthoringEntity.Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
 #if ENABLE_IL2CPP
 		[Il2CppSetOption(Option.NullChecks, false)]
@@ -55,12 +48,11 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_wrapper._entity.IsNull())
+				if (_wrapper._entity.Unpack(out world, out _))
 				{
 					return;
 				}
 
-				_wrapper._world = world;
 				foreach (var nested in _wrapper._gameObject.GetComponents<IAuthoring>())
 				{
 					nested.CreateBaker().Bake(_wrapper, world);
