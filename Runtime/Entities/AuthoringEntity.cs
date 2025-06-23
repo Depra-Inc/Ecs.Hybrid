@@ -43,7 +43,7 @@ namespace Depra.Ecs.Hybrid
 
 		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
-		IBaker IAuthoring.CreateBaker() => new Backer(this, _destructionMode);
+		IBaker IAuthoring.CreateBaker() => new Backer(this);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Initialize(PackedEntityWithWorld entity)
@@ -77,13 +77,14 @@ namespace Depra.Ecs.Hybrid
 		public readonly struct Backer : IBaker
 		{
 			private readonly AuthoringEntity _authoringEntity;
-			private readonly DestructionMode _destructionMode;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Backer(AuthoringEntity authoringEntity, DestructionMode destructionMode)
+			public Backer(AuthoringEntity authoringEntity) => _authoringEntity = authoringEntity;
+
+			private DestructionMode DestructionMode
 			{
-				_authoringEntity = authoringEntity;
-				_destructionMode = destructionMode;
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => _authoringEntity._destructionMode;
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -94,7 +95,7 @@ namespace Depra.Ecs.Hybrid
 				foreach (var element in nested.Enumerate())
 				{
 					element.CreateBaker().Bake(_authoringEntity, world);
-					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
+					if (DestructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
 						Destroy((Component)element);
 					}
