@@ -46,9 +46,9 @@ namespace Depra.Ecs.Hybrid
 			public Baker(EntityBinding binding) => _binding = binding;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			void IBaker.Bake(IAuthoring authoring, World world)
+			public void Bake()
 			{
-				if (_binding._entity.Unpack(out world, out _))
+				if (_binding._entity.Unpack(out var world, out _))
 				{
 					return;
 				}
@@ -58,10 +58,13 @@ namespace Depra.Ecs.Hybrid
 					nested.CreateBaker().Bake(_binding, world);
 					if (_binding._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Object.Destroy((Component)authoring);
+						Object.Destroy((Component)nested);
 					}
 				}
 			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			void IBaker.Bake(IAuthoring authoring, World world) => Bake();
 		}
 	}
 }
