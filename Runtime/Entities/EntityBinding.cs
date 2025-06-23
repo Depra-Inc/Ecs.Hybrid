@@ -30,7 +30,8 @@ namespace Depra.Ecs.Hybrid
 			_destructionMode = destructionMode;
 		}
 
-		IBaker IAuthoring.CreateBaker() => new Baker(this);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public IBaker CreateBaker() => new Baker(this);
 
 		bool IAuthoringEntity.Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
@@ -53,12 +54,12 @@ namespace Depra.Ecs.Hybrid
 					return;
 				}
 
-				foreach (var nested in _binding._gameObject.GetComponents<IAuthoring>())
+				foreach (var authoring in _binding._gameObject.GetComponents<IAuthoring>())
 				{
-					nested.CreateBaker().Bake(_binding, world);
+					authoring.CreateBaker().Bake(_binding, world);
 					if (_binding._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Object.Destroy((Component)nested);
+						Object.Destroy((Component)authoring);
 					}
 				}
 			}
