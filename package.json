@@ -1,6 +1,6 @@
 {
 	"name": "com.depra.ecs.hybrid",
-	"version": "0.3.4-pre.9",
+	"version": "0.3.4-pre.10",
 	"displayName": "Depra.Ecs.Hybrid",
 	"description": "Unity Conversion Workflow for Depra.Ecs. Easy convert GameObjects to Entity.",
 	"unity": "2022.3",

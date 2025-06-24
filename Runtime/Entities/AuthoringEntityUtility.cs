@@ -59,17 +59,25 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_entity.Unpack(out world, out _))
+				if (_entity.Unpack(out world, out var entity))
 				{
+					Debug.LogError($"Failed to unpack entity '{entity}'!", _gameObject);
 					return;
 				}
 
-				foreach (var nestedAuthoring in _gameObject.GetComponents<IAuthoring>())
+				var authoringComponents = _gameObject.GetComponents<IAuthoring>();
+				if (authoringComponents.Length == 0)
 				{
-					nestedAuthoring.CreateBaker().Bake(this, world);
+					Debug.LogWarning($"No authoring components found on '{_gameObject.name}'", _gameObject);
+					return;
+				}
+
+				foreach (var authoringComponent in authoringComponents)
+				{
+					authoringComponent.CreateBaker().Bake(this, world);
 					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
-						Object.Destroy((Component)nestedAuthoring);
+						Object.Destroy((Component)authoringComponent);
 					}
 				}
 			}
