@@ -59,7 +59,7 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_entity.Unpack(out world, out var entity))
+				if (!_entity.Unpack(out world, out var entity))
 				{
 					Debug.LogError($"Failed to unpack entity '{entity}'!", _gameObject);
 					return;
