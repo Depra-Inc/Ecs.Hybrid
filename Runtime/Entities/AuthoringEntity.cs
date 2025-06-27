@@ -43,8 +43,9 @@ namespace Depra.Ecs.Hybrid
 
 		public bool Unpack(out World world, out Entity entity) => _entity.Unpack(out world, out entity);
 
-		IBaker IAuthoring.CreateBaker() => new Backer(_destructionMode);
+		IBaker IAuthoring.CreateBaker() => new Backer(this);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void Initialize(PackedEntityWithWorld entity)
 		{
 			_entity = entity;
@@ -75,33 +76,34 @@ namespace Depra.Ecs.Hybrid
 #endif
 		private readonly struct Backer : IBaker
 		{
-			private readonly DestructionMode _destructionMode;
+			private readonly AuthoringEntity _component;
 
-			public Backer(DestructionMode destructionMode) => _destructionMode = destructionMode;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Backer(AuthoringEntity component) => _component = component;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				var authoringEntity = (AuthoringEntity)authoring;
-				if (authoringEntity._processed)
+				if (_component._processed)
 				{
 					return;
 				}
 
 				var entity = world.CreateEntity();
-				authoringEntity.Initialize(world.PackEntityWithWorld(entity));
+				var packedEntity = world.PackEntityWithWorld(entity);
+				_component.Initialize(packedEntity);
 
-				using var nested = authoringEntity.GetNested();
-				foreach (var element in nested.Enumerate())
+				using var access = _component.GetNested();
+				foreach (var element in access.Enumerate())
 				{
-					element.CreateBaker().Bake(authoringEntity, world);
-					if (_destructionMode == DestructionMode.DESTROY_COMPONENT)
+					element.CreateBaker().Bake(_component, world);
+					if (_component._destructionMode == DestructionMode.DESTROY_COMPONENT)
 					{
 						Destroy((Component)element);
 					}
 				}
 
-				authoringEntity.FinalizeConversion();
+				_component.FinalizeConversion();
 			}
 		}
 	}

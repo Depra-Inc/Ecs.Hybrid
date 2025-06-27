@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Depra.Ecs.Hybrid.Internal
 {
-	internal enum DestructionMode
+	public enum DestructionMode
 	{
 		[InspectorName("None")]
 		NONE,
