@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -48,6 +48,37 @@ namespace Depra.Ecs.Hybrid
 				}
 #endif
 				world.Pools[componentType].Allocate(entity, component);
+			}
+		}
+
+		public void Modify(World world, Entity entity)
+		{
+			foreach (var component in _components)
+			{
+#if ECS_DEBUG
+				if (component == null)
+				{
+					Debug.LogWarning("Component is null", this);
+					continue;
+				}
+#endif
+				var componentType = component.GetType();
+#if ECS_DEBUG
+				if (!world.Pools.Contains(componentType))
+				{
+					Debug.LogWarning($"Component pool for {componentType} is not found", this);
+					continue;
+				}
+#endif
+				var pool = world.Pools[componentType];
+				if (pool.Contains(entity))
+				{
+					pool.Set(entity, component);
+				}
+				else
+				{
+					world.Pools[componentType].Allocate(entity, component);
+				}
 			}
 		}
 	}
