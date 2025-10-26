@@ -1,0 +1,18 @@
+{
+    "name": "Depra.Ecs.Hybrid.Editor",
+    "rootNamespace": "Depra.Ecs.Hybrid",
+    "references": [
+        "GUID:e26e79c2120fe6b48b93f825f9528a77"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
