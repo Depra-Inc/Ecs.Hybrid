@@ -37,9 +37,10 @@ namespace Depra.Ecs.Hybrid
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void BakeEntity(IAuthoringEntity authoringEntity, World world)
+		public static Entity BakeEntity(IAuthoringEntity authoringEntity, World world)
 		{
 			authoringEntity.CreateBaker().Bake(authoringEntity, world);
+			return authoringEntity.Unpack(out _, out var entity) ? entity : Entity.NULL;
 		}
 
 #if ENABLE_IL2CPP
