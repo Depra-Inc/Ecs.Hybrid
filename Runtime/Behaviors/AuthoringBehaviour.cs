@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
@@ -20,10 +21,15 @@ namespace Depra.Ecs.Hybrid
 
 		protected abstract void Bake(World world);
 
+#if ENABLE_IL2CPP
+		[Il2CppSetOption(Option.NullChecks, false)]
+		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
+#endif
 		private readonly struct Baker : IBaker
 		{
 			private readonly AuthoringBehaviour _behaviour;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public Baker(AuthoringBehaviour behaviour) => _behaviour = behaviour;
 
 			void IBaker.Bake(IAuthoring authoring, World world) => _behaviour.Bake(world);

@@ -17,7 +17,7 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	[AddComponentMenu(MENU_PATH + nameof(AuthoringAspect), DEFAULT_ORDER)]
+	[AddComponentMenu(MENU_PATH + "Authoring Aspect", DEFAULT_ORDER)]
 	public sealed class AuthoringAspect : MonoBehaviour, IAuthoring
 	{
 		[Tooltip("GameObjects with IAuthoring components to be baked.")]

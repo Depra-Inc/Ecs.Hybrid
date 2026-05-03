@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -15,7 +15,7 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	[AddComponentMenu(MENU_PATH + nameof(AuthoringComponentDatabase), DEFAULT_ORDER)]
+	[AddComponentMenu(MENU_PATH + "Authoring Component Database", DEFAULT_ORDER)]
 	public sealed class AuthoringComponentDatabase : MonoBehaviour, IAuthoring
 	{
 		[SerializeField] private ComponentDatabase[] _components;
@@ -40,7 +40,7 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (((IAuthoringEntity)authoring).Unpack(out var entity) == false)
+				if (!((IAuthoringEntity)authoring).Unpack(out var entity))
 				{
 #if ECS_DEBUG
 					Debug.LogWarning($"Failed to unpack entity from '{_database.name}'", _database);

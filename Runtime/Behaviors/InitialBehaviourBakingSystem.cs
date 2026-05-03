@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using Depra.Ecs.Hybrid.Internal;
 #if ENABLE_IL2CPP
@@ -12,9 +12,9 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.NullChecks, false)]
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-	public sealed class InitialBehaviourBakingSystem : IPreInitializationSystem
+	public sealed class InitialBehaviourBakingSystem : IInitializationSystem
 	{
-		void IPreInitializationSystem.PreInitialize(IWorldGroup worlds)
+		void IInitializationSystem.Initialize(IWorldGroup worlds)
 		{
 			foreach (var authoringBehaviour in SceneUtility.FindOnActiveScene<AuthoringBehaviour>())
 			{

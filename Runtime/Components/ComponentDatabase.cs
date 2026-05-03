@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -25,13 +25,14 @@ namespace Depra.Ecs.Hybrid
 		private const string FILE_NAME = nameof(ComponentDatabase);
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;
 
-		public IEnumerable<object> Components => _components;
+		public IReadOnlyList<object> Components => _components;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Setup(World world, Entity entity)
 		{
-			foreach (var component in _components)
+			for (int index = 0, count = _components.Length; index < count; index++)
 			{
+				var component = _components[index];
 #if ECS_DEBUG
 				if (component == null)
 				{
@@ -53,8 +54,9 @@ namespace Depra.Ecs.Hybrid
 
 		public void Modify(World world, Entity entity)
 		{
-			foreach (var component in _components)
+			for (int index = 0, count = _components.Length; index < count; index++)
 			{
+				var component = _components[index];
 #if ECS_DEBUG
 				if (component == null)
 				{
