@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+// © 2023-2026 Depra <n.melnikov@depra.org>
+
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Depra.SerializeReference.Extensions;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.RuntimeSceneBakeModule;
 #if ENABLE_IL2CPP
@@ -13,53 +17,37 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
 	[CreateAssetMenu(menuName = MENU_NAME, fileName = FILE_NAME, order = DEFAULT_ORDER)]
-	public sealed class EntityRecipe : ScriptableObject, IAuthoring
+	public sealed class EntityRecipe : ScriptableObject
 	{
-		[SerializeField] private List<ComponentDatabase> _sets = new();
+		[SerializeField] private List<ComponentDatabase> _componentBundles = new();
 
-		private const string FILE_NAME = nameof(EntityRecipe);
+		[SerializeReferenceDropdown]
+		[UnityEngine.SerializeReference]
+		private List<IAuthoring> _componentSources;
+
+		private const string FILE_NAME = "Entity Recipe";
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;
 
-		public void Add(ComponentDatabase database)
+		internal List<IAuthoring> ComponentSources
 		{
-			if (database && !_sets.Contains(database))
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => _componentSources;
+		}
+
+		internal List<ComponentDatabase> ComponentBundles
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => _componentBundles;
+		}
+
+		internal void Add(ComponentDatabase bundle)
+		{
+			if (bundle && !_componentBundles.Contains(bundle))
 			{
-				_sets.Add(database);
+				_componentBundles.Add(bundle);
 			}
 		}
 
-		public void Remove(ComponentDatabase database) => _sets.Remove(database);
-
-		public IBaker CreateBaker() => new Baker(this);
-
-#if ENABLE_IL2CPP
-		[Il2CppSetOption(Option.NullChecks, false)]
-		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
-#endif
-		private readonly struct Baker : IBaker
-		{
-			private readonly EntityRecipe _recipe;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Baker(EntityRecipe recipe) => _recipe = recipe;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			void IBaker.Bake(IAuthoring authoring, World world)
-			{
-				if (!((IAuthoringEntity)authoring).Unpack(out var entity))
-				{
-#if ECS_DEBUG
-					Debug.LogWarning($"Failed to unpack entity by recipe '{_recipe.name}'", _recipe);
-#endif
-					return;
-				}
-
-				var sets = _recipe._sets;
-				for (int index = 0, count = sets.Count; index < count; index++)
-				{
-					sets[index].Modify(world, entity);
-				}
-			}
-		}
+		internal void Remove(ComponentDatabase database) => _componentBundles.Remove(database);
 	}
 }

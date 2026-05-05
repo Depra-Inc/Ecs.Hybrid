@@ -13,13 +13,14 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 {
 	/// <summary>
 	/// TEMPORARY: Migration utility for AuthoringComponentDatabase -> AuthoringRecipe
-	/// TODO: Remove this file after migration is complete (expected: [DATE])
+	/// TODO: Remove this file after migration is complete.
 	/// </summary>
-	internal static class AuthoringRecipeMigration
+	internal static class AuthoringComponentDatabaseMigration
 	{
-		private const string MIGRATION_KEY = "AuthoringRecipe_Migration_v1_Completed";
+		private const string FILE_POSFIX = " Recipe.asset";
+		private const string MIGRATION_KEY = "AuthoringComponentDatabase_Migration_v1_Completed";
 
-		[MenuItem("Ecs/Migration/Authoring Recipes/1. Preview Changes")]
+		[MenuItem("Ecs/Migration/Authoring Component Database/1. Preview Changes")]
 		public static void PreviewMigration()
 		{
 			var targets = FindMigrationTargets().ToArray();
@@ -40,7 +41,7 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 			EditorUtility.DisplayDialog("Migration Preview", message, "OK");
 		}
 
-		[MenuItem("Ecs/Migration/Authoring Recipes/2. Run Migration")]
+		[MenuItem("Ecs/Migration/Authoring Component Database/2. Run Migration")]
 		public static void RunMigration()
 		{
 			if (EditorPrefs.GetBool(MIGRATION_KEY, false))
@@ -79,7 +80,7 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 				"OK");
 		}
 
-		[MenuItem("Ecs/Migration/Authoring Recipes/3. Reset Migration Flag")]
+		[MenuItem("Ecs/Migration/Authoring Component Database/3. Reset Migration Flag")]
 		public static void ResetMigrationFlag()
 		{
 			EditorPrefs.DeleteKey(MIGRATION_KEY);
@@ -89,13 +90,13 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 		public static bool MigratePrefab(string path)
 		{
 			var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-			if (prefab == null)
+			if (!prefab)
 			{
 				return false;
 			}
 
 			var entity = prefab.GetComponent<AuthoringEntity>();
-			if (entity == null)
+			if (!entity)
 			{
 				return false;
 			}
@@ -106,27 +107,28 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 				return false;
 			}
 
-			var recipe = prefab.GetComponent<AuthoringRecipe>() ?? prefab.AddComponent<AuthoringRecipe>();
-			if (recipe._Recipe == null)
+			var recipe = prefab.GetComponent<AuthoringEntityRecipe>() ?? prefab.AddComponent<AuthoringEntityRecipe>();
+			if (!recipe.Recipe)
 			{
 				var recipePath = Path.Combine(Path.GetDirectoryName(path)!,
-					Path.GetFileNameWithoutExtension(path) + " Recipe.asset");
+					Path.GetFileNameWithoutExtension(path) + FILE_POSFIX);
 				var newRecipe = ScriptableObject.CreateInstance<EntityRecipe>();
 				AssetDatabase.CreateAsset(newRecipe, recipePath);
-				recipe._Recipe = newRecipe;
+				recipe.Recipe = newRecipe;
 			}
 
 			foreach (var database in databases)
 			{
 				foreach (var set in database.Enumerate())
 				{
-					recipe._Recipe.Add(set);
+					recipe.Recipe.Add(set);
 				}
 
 				Object.DestroyImmediate(database, true);
 			}
 
 			EditorUtility.SetDirty(prefab);
+			EditorUtility.SetDirty(recipe.Recipe);
 			return true;
 		}
 
@@ -147,7 +149,7 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 			for (var index = 0; index < paths.Length; index++)
 			{
 				var path = paths[index];
-				EditorUtility.DisplayProgressBar("Migrating Authoring Recipes",
+				EditorUtility.DisplayProgressBar("Migrating Authoring Component Databases",
 					$"Processing {index + 1}/{paths.Length}: {path}",
 					(float)index / paths.Length);
 

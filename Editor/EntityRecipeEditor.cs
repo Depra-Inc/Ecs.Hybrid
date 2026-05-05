@@ -7,25 +7,38 @@ using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Depra.Ecs.Hybrid.Editor
 {
 	[CustomEditor(typeof(EntityRecipe))]
 	internal sealed class EntityRecipeEditor : UnityEditor.Editor
 	{
-		private SerializedProperty _setsProperty;
-		private ReorderableList _reorderableList;
+		private static void DrawBundlesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Bundles");
+		private static void DrawSourcesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Sources");
+
+		private ReorderableList _componentBundles;
+		private SerializedProperty _componentBundlesProperty;
+		private ReorderableList _componentSources;
+		private SerializedProperty _componentSourcesProperty;
 
 		private void OnEnable()
 		{
-			_setsProperty = serializedObject.FindProperty("_sets");
-			_reorderableList = new ReorderableList(serializedObject, _setsProperty, true, true, true, true)
+			_componentBundlesProperty = serializedObject.FindProperty("_componentBundles");
+			_componentBundles = new ReorderableList(serializedObject, _componentBundlesProperty, true, true, true, true)
 			{
-				drawHeaderCallback = DrawHeader,
-				drawElementCallback = DrawElement,
-				onAddCallback = OnAdd,
-				onRemoveCallback = OnRemove,
+				drawHeaderCallback = DrawBundlesHeader,
+				drawElementCallback = DrawBundleElement,
+				onAddCallback = OnBundleAdded,
+				onRemoveCallback = OnBundleRemoved,
 				elementHeight = EditorGUIUtility.singleLineHeight + 2
+			};
+
+			_componentSourcesProperty = serializedObject.FindProperty("_componentSources");
+			_componentSources = new ReorderableList(serializedObject, _componentSourcesProperty, true, true, true, true)
+			{
+				drawHeaderCallback = DrawSourcesHeader,
+				drawElementCallback = DrawSourceElement
 			};
 		}
 
@@ -35,15 +48,16 @@ namespace Depra.Ecs.Hybrid.Editor
 			var recipe = (EntityRecipe)target;
 			DrawControlButtons(recipe);
 			EditorGUILayout.Space(5);
-			_reorderableList.DoLayoutList();
+			_componentBundles.DoLayoutList();
+			_componentSources.DoLayoutList();
 			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawControlButtons(EntityRecipe recipe)
 		{
-			var sets = GetSets();
-			var externalCount = sets.Count(set => !IsNestedInAsset(set, recipe));
-			var nestedCount = sets.Count - externalCount;
+			var bundles = GetBundles();
+			var externalCount = bundles.Count(set => !IsNestedInAsset(set, recipe));
+			var nestedCount = bundles.Count - externalCount;
 
 			EditorGUILayout.LabelField($"Nested: {nestedCount} | External: {externalCount}", EditorStyles.miniLabel);
 			EditorGUILayout.BeginHorizontal();
@@ -51,7 +65,7 @@ namespace Depra.Ecs.Hybrid.Editor
 			EditorGUI.BeginDisabledGroup(externalCount == 0);
 			if (GUILayout.Button("Make All Nested"))
 			{
-				MakeAllNested(recipe, sets);
+				MakeAllNested(recipe, bundles);
 			}
 
 			EditorGUI.EndDisabledGroup();
@@ -59,26 +73,32 @@ namespace Depra.Ecs.Hybrid.Editor
 			EditorGUI.BeginDisabledGroup(nestedCount == 0);
 			if (GUILayout.Button("Extract All"))
 			{
-				ExtractAllNested(recipe, sets);
+				ExtractAllNested(recipe, bundles);
 			}
 
 			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.EndHorizontal();
 		}
 
-		private static void DrawHeader(Rect rect) => EditorGUI.LabelField(rect, "Sets");
-
-		private void DrawElement(Rect rect, int index, bool isActive, bool isFocused)
+		private void DrawSourceElement(Rect rect, int index, bool isActive, bool isFocused)
 		{
-			var element = _setsProperty.GetArrayElementAtIndex(index);
-			var componentDB = element.objectReferenceValue as ComponentDatabase;
+			var element = _componentSourcesProperty.GetArrayElementAtIndex(index);
+			rect.y += 2;
+			rect.height = EditorGUIUtility.singleLineHeight;
+			EditorGUI.PropertyField(rect, element, new GUIContent($"Element {index + 1}"), true);
+		}
+
+		private void DrawBundleElement(Rect rect, int index, bool isActive, bool isFocused)
+		{
+			var element = _componentBundlesProperty.GetArrayElementAtIndex(index);
+			var componentBundle = element.objectReferenceValue as ComponentDatabase;
 			var recipe = (EntityRecipe)target;
 
 			rect.y += 2;
 			rect.height = EditorGUIUtility.singleLineHeight;
 
 			var statusRect = new Rect(rect.x, rect.y, 12, rect.height);
-			var isNested = componentDB && IsNestedInAsset(componentDB, recipe);
+			var isNested = componentBundle && IsNestedInAsset(componentBundle, recipe);
 			var statusLabel = isNested ? "N" : "E";
 			var statusColor = isNested ? new Color(0.3f, 0.7f, 0.3f) : new Color(0.5f, 0.5f, 0.5f);
 
@@ -88,22 +108,22 @@ namespace Depra.Ecs.Hybrid.Editor
 			EditorGUI.LabelField(statusRect, statusContent, EditorStyles.miniLabel);
 			GUI.color = oldColor;
 
-			if (isNested && componentDB)
+			if (isNested && componentBundle)
 			{
 				EditorGUILayout.BeginHorizontal();
 
 				EditorGUI.BeginDisabledGroup(true);
 				var nestedDBRect = new Rect(rect.x + 15, rect.y, rect.width - 270, rect.height);
-				EditorGUI.ObjectField(nestedDBRect, componentDB, typeof(ComponentDatabase), false);
+				EditorGUI.ObjectField(nestedDBRect, componentBundle, typeof(ComponentDatabase), false);
 				EditorGUI.EndDisabledGroup();
 
 				var labelRect = new Rect(rect.width - 210, rect.y, 200, rect.height);
-				var newName = EditorGUI.TextField(labelRect, componentDB.name);
-				if (newName != componentDB.name && !string.IsNullOrWhiteSpace(newName))
+				var newName = EditorGUI.TextField(labelRect, componentBundle.name);
+				if (newName != componentBundle.name && !string.IsNullOrWhiteSpace(newName))
 				{
-					Undo.RecordObject(componentDB, "Rename Nested Asset");
-					componentDB.name = newName;
-					EditorUtility.SetDirty(componentDB);
+					Undo.RecordObject(componentBundle, "Rename Nested Asset");
+					componentBundle.name = newName;
+					EditorUtility.SetDirty(componentBundle);
 					AssetDatabase.SaveAssets();
 				}
 
@@ -112,14 +132,14 @@ namespace Depra.Ecs.Hybrid.Editor
 			else
 			{
 				var fieldRect = new Rect(rect.x + 15, rect.y, rect.width - 65, rect.height);
-				var newValue = EditorGUI.ObjectField(fieldRect, componentDB, typeof(ComponentDatabase), false) as ComponentDatabase;
-				if (newValue != componentDB)
+				var newValue = EditorGUI.ObjectField(fieldRect, componentBundle, typeof(ComponentDatabase), false) as ComponentDatabase;
+				if (newValue != componentBundle)
 				{
 					element.objectReferenceValue = newValue;
 				}
 			}
 
-			if (componentDB)
+			if (componentBundle)
 			{
 				var actionRect = new Rect(rect.x + rect.width - 45, rect.y, 45, rect.height);
 				if (!isNested)
@@ -139,27 +159,27 @@ namespace Depra.Ecs.Hybrid.Editor
 			}
 		}
 
-		private void OnAdd(ReorderableList list)
+		private void OnBundleAdded(ReorderableList list)
 		{
 			list.serializedProperty.arraySize++;
 			var newElement = list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
 			newElement.objectReferenceValue = null;
 		}
 
-		private void OnRemove(ReorderableList list)
+		private void OnBundleRemoved(ReorderableList list)
 		{
 			var element = list.serializedProperty.GetArrayElementAtIndex(list.index);
-			var componentDB = element.objectReferenceValue as ComponentDatabase;
+			var componentBundle = element.objectReferenceValue as ComponentDatabase;
 			var recipe = (EntityRecipe)target;
 
 			Undo.RecordObject(recipe, "Remove Set");
 
-			if (componentDB)
+			if (componentBundle)
 			{
-				recipe.Remove(componentDB);
-				if (IsNestedInAsset(componentDB, recipe))
+				recipe.Remove(componentBundle);
+				if (IsNestedInAsset(componentBundle, recipe))
 				{
-					Undo.DestroyObjectImmediate(componentDB);
+					Undo.DestroyObjectImmediate(componentBundle);
 				}
 			}
 
@@ -167,19 +187,19 @@ namespace Depra.Ecs.Hybrid.Editor
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		private List<ComponentDatabase> GetSets()
+		private List<ComponentDatabase> GetBundles()
 		{
-			var sets = new List<ComponentDatabase>();
-			for (var i = 0; i < _setsProperty.arraySize; i++)
+			var bundles = new List<ComponentDatabase>();
+			for (var index = 0; index < _componentBundlesProperty.arraySize; index++)
 			{
-				var element = _setsProperty.GetArrayElementAtIndex(i).objectReferenceValue as ComponentDatabase;
+				var element = _componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue as ComponentDatabase;
 				if (element)
 				{
-					sets.Add(element);
+					bundles.Add(element);
 				}
 			}
 
-			return sets;
+			return bundles;
 		}
 
 		private static bool IsNestedInAsset(Object obj, Object parent)
@@ -194,20 +214,21 @@ namespace Depra.Ecs.Hybrid.Editor
 			return objPath == parentPath && AssetDatabase.IsSubAsset(obj);
 		}
 
-		private void MakeAllNested(EntityRecipe recipe, List<ComponentDatabase> sets)
+		private void MakeAllNested(EntityRecipe recipe, List<ComponentDatabase> bundles)
 		{
 			Undo.RecordObject(recipe, "Make All Nested");
 			var convertedCount = 0;
 
-			for (var i = 0; i < sets.Count; i++)
+			for (var index = 0; index < bundles.Count; index++)
 			{
-				if (!sets[i] || IsNestedInAsset(sets[i], recipe))
+				var componentBundle = bundles[index];
+				if (!componentBundle || IsNestedInAsset(componentBundle, recipe))
 				{
 					continue;
 				}
 
-				var newNested = CreateNestedCopy(recipe, sets[i]);
-				_setsProperty.GetArrayElementAtIndex(i).objectReferenceValue = newNested;
+				var newNested = CreateNestedCopy(recipe, componentBundle);
+				_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
 				convertedCount++;
 			}
 
@@ -219,7 +240,7 @@ namespace Depra.Ecs.Hybrid.Editor
 
 		private void MakeNested(EntityRecipe recipe, int index)
 		{
-			var original = _setsProperty.GetArrayElementAtIndex(index).objectReferenceValue as ComponentDatabase;
+			var original = _componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue as ComponentDatabase;
 			if (!original || IsNestedInAsset(original, recipe))
 			{
 				return;
@@ -227,7 +248,7 @@ namespace Depra.Ecs.Hybrid.Editor
 
 			Undo.RecordObject(recipe, $"Make Nested: {original.name}");
 			var newNested = CreateNestedCopy(recipe, original);
-			_setsProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
+			_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
 
 			serializedObject.ApplyModifiedProperties();
 			EditorUtility.SetDirty(recipe);
@@ -243,19 +264,23 @@ namespace Depra.Ecs.Hybrid.Editor
 			return copy;
 		}
 
-		private void ExtractAllNested(EntityRecipe recipe, List<ComponentDatabase> sets)
+		private void ExtractAllNested(EntityRecipe recipe, List<ComponentDatabase> bundles)
 		{
 			var recipePath = AssetDatabase.GetAssetPath(recipe);
 			var directory = Path.GetDirectoryName(recipePath);
 			Undo.RecordObject(recipe, "Extract All Nested");
 			var extractedCount = 0;
 
-			for (var i = 0; i < sets.Count; i++)
+			for (var index = 0; index < bundles.Count; index++)
 			{
-				if (!sets[i] || !IsNestedInAsset(sets[i], recipe)) continue;
+				var componentBundle = bundles[index];
+				if (!componentBundle || !IsNestedInAsset(componentBundle, recipe))
+				{
+					continue;
+				}
 
-				var extracted = ExtractToNewAsset(sets[i], directory);
-				_setsProperty.GetArrayElementAtIndex(i).objectReferenceValue = extracted;
+				var extracted = ExtractToNewAsset(componentBundle, directory);
+				_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = extracted;
 				extractedCount++;
 			}
 
@@ -267,15 +292,18 @@ namespace Depra.Ecs.Hybrid.Editor
 
 		private void ExtractNested(EntityRecipe recipe, int index)
 		{
-			var nested = _setsProperty.GetArrayElementAtIndex(index).objectReferenceValue as ComponentDatabase;
-			if (!nested || !IsNestedInAsset(nested, recipe)) return;
+			var nested = _componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue as ComponentDatabase;
+			if (!nested || !IsNestedInAsset(nested, recipe))
+			{
+				return;
+			}
 
 			var recipePath = AssetDatabase.GetAssetPath(recipe);
 			var directory = Path.GetDirectoryName(recipePath);
 			Undo.RecordObject(recipe, $"Extract Nested: {nested.name}");
 
 			var extracted = ExtractToNewAsset(nested, directory);
-			_setsProperty.GetArrayElementAtIndex(index).objectReferenceValue = extracted;
+			_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = extracted;
 
 			serializedObject.ApplyModifiedProperties();
 			EditorUtility.SetDirty(recipe);
