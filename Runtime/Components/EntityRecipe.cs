@@ -28,13 +28,13 @@ namespace Depra.Ecs.Hybrid
 		private const string FILE_NAME = "Entity Recipe";
 		private const string MENU_NAME = MENU_PATH + FILE_NAME;
 
-		internal List<IAuthoring> ComponentSources
+		public List<IAuthoring> ComponentSources
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => _componentSources;
 		}
 
-		internal List<ComponentDatabase> ComponentBundles
+		public List<ComponentDatabase> ComponentBundles
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => _componentBundles;

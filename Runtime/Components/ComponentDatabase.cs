@@ -27,7 +27,7 @@ namespace Depra.Ecs.Hybrid
 
 		public IReadOnlyList<object> Components => _components;
 
-		public void Apply(World world, in Entity entity)
+		public void Apply(in Entity entity, World world)
 		{
 			for (int index = 0, count = _components.Length; index < count; index++)
 			{
@@ -60,9 +60,9 @@ namespace Depra.Ecs.Hybrid
 		}
 
 		[Obsolete("Use Apply(World, Entity) instead")]
-		public void Setup(World world, Entity entity) => Apply(world, entity);
+		public void Setup(World world, Entity entity) => Apply(entity, world);
 
 		[Obsolete("Use Apply(World, Entity) instead")]
-		public void Modify(World world, Entity entity) => Apply(world, entity);
+		public void Modify(World world, Entity entity) => Apply(entity, world);
 	}
 }

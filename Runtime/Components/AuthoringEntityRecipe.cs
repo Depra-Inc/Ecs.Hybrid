@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // © 2023-2026 Depra <n.melnikov@depra.org>
 
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Depra.Ecs.Hybrid.RuntimeSceneBakeModule;
@@ -15,11 +16,11 @@ namespace Depra.Ecs.Hybrid
 	[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
 	[AddComponentMenu(MENU_PATH + "Authoring Entity Recipe", DEFAULT_ORDER)]
-	internal sealed class AuthoringEntityRecipe : MonoBehaviour, IAuthoring
+	public sealed class AuthoringEntityRecipe : MonoBehaviour, IAuthoring
 	{
 		[SerializeField] private EntityRecipe _recipe;
 
-		internal EntityRecipe Recipe
+		public EntityRecipe Recipe
 		{
 			get => _recipe;
 			set => _recipe = value;
@@ -52,7 +53,7 @@ namespace Depra.Ecs.Hybrid
 				var batches = _recipe.ComponentBundles;
 				for (int index = 0, count = batches.Count; index < count; index++)
 				{
-					batches[index].Modify(world, entity);
+					batches[index].Apply(entity, world);
 				}
 
 				var authorings = _recipe.ComponentSources;
