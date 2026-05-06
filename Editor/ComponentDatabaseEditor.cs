@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using System.Runtime.InteropServices;
 using UnityEditor;
@@ -15,7 +15,7 @@ namespace Depra.Ecs.Hybrid.Editor
 			DrawSizeLabel(serializedObject.FindProperty("_components"));
 		}
 
-		private void DrawSizeLabel(SerializedProperty property)
+		private static void DrawSizeLabel(SerializedProperty property)
 		{
 			var size = 0;
 			for (var index = 0; index < property.arraySize; index++)
