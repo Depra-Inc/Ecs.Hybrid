@@ -17,7 +17,7 @@ namespace Depra.Ecs.Hybrid.Editor.Migration
 	/// </summary>
 	internal static class AuthoringComponentDatabaseMigration
 	{
-		private const string FILE_POSFIX = " Recipe.asset";
+		private const string FILE_POSFIX = " Entity.asset";
 		private const string MIGRATION_KEY = "AuthoringComponentDatabase_Migration_v1_Completed";
 
 		[MenuItem("Ecs/Migration/Authoring Component Database/1. Preview Changes")]
