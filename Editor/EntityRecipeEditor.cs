@@ -87,14 +87,14 @@ namespace Depra.Ecs.Hybrid.Editor
 		private void DrawBundleElement(Rect rect, int index, bool isActive, bool isFocused)
 		{
 			var element = _componentBundlesProperty.GetArrayElementAtIndex(index);
-			var componentBundle = element.objectReferenceValue as ComponentDatabase;
+			var bundle = element.objectReferenceValue as ComponentDatabase;
 			var recipe = (EntityRecipe)target;
 
 			rect.y += 2;
 			rect.height = EditorGUIUtility.singleLineHeight;
 
 			var statusRect = new Rect(rect.x, rect.y, 12, rect.height);
-			var isNested = componentBundle && IsNestedInAsset(componentBundle, recipe);
+			var isNested = bundle && IsNestedInAsset(bundle, recipe);
 			var statusLabel = isNested ? "N" : "E";
 			var statusColor = isNested ? new Color(0.3f, 0.7f, 0.3f) : new Color(0.5f, 0.5f, 0.5f);
 
@@ -104,22 +104,22 @@ namespace Depra.Ecs.Hybrid.Editor
 			EditorGUI.LabelField(statusRect, statusContent, EditorStyles.miniLabel);
 			GUI.color = oldColor;
 
-			if (isNested && componentBundle)
+			if (bundle && isNested)
 			{
 				EditorGUILayout.BeginHorizontal();
 
 				EditorGUI.BeginDisabledGroup(true);
-				var nestedDBRect = new Rect(rect.x + 15, rect.y, rect.width - 270, rect.height);
-				EditorGUI.ObjectField(nestedDBRect, componentBundle, typeof(ComponentDatabase), false);
+				var nestedRect = new Rect(rect.x + 15, rect.y, rect.width - 270, rect.height);
+				EditorGUI.ObjectField(nestedRect, bundle, typeof(ComponentDatabase), false);
 				EditorGUI.EndDisabledGroup();
 
 				var labelRect = new Rect(rect.width - 210, rect.y, 200, rect.height);
-				var newName = EditorGUI.TextField(labelRect, componentBundle.name);
-				if (newName != componentBundle.name && !string.IsNullOrWhiteSpace(newName))
+				var newName = EditorGUI.TextField(labelRect, bundle.name);
+				if (newName != bundle.name && !string.IsNullOrWhiteSpace(newName))
 				{
-					Undo.RecordObject(componentBundle, "Rename Nested Asset");
-					componentBundle.name = newName;
-					EditorUtility.SetDirty(componentBundle);
+					Undo.RecordObject(bundle, "Rename Nested Asset");
+					bundle.name = newName;
+					EditorUtility.SetDirty(bundle);
 					AssetDatabase.SaveAssets();
 				}
 
@@ -128,17 +128,17 @@ namespace Depra.Ecs.Hybrid.Editor
 			else
 			{
 				var fieldRect = new Rect(rect.x + 15, rect.y, rect.width - 65, rect.height);
-				var newValue = EditorGUI.ObjectField(fieldRect, componentBundle, typeof(ComponentDatabase), false) as ComponentDatabase;
-				if (newValue != componentBundle)
+				var newValue = EditorGUI.ObjectField(fieldRect, bundle, typeof(ComponentDatabase), false) as ComponentDatabase;
+				if (newValue != bundle)
 				{
 					element.objectReferenceValue = newValue;
 				}
 			}
 
-			if (componentBundle)
+			if (bundle)
 			{
 				var actionRect = new Rect(rect.x + rect.width - 45, rect.y, 45, rect.height);
-				var pendingOriginalPath = isNested ? GetPendingDeletionPath(componentBundle) : null;
+				var pendingOriginalPath = isNested ? GetPendingDeletionPath(bundle) : null;
 				var hasPendingOriginal = !string.IsNullOrEmpty(pendingOriginalPath);
 
 				if (!isNested)
@@ -154,7 +154,7 @@ namespace Depra.Ecs.Hybrid.Editor
 					GUI.backgroundColor = new Color(1f, 0.3f, 0.3f);
 					if (GUI.Button(actionRect, "Del"))
 					{
-						DeleteOriginal(componentBundle, pendingOriginalPath);
+						DeleteOriginal(bundle, pendingOriginalPath);
 					}
 
 					GUI.backgroundColor = originalColor;
@@ -179,12 +179,11 @@ namespace Depra.Ecs.Hybrid.Editor
 		private void OnBundleRemoved(ReorderableList list)
 		{
 			var element = list.serializedProperty.GetArrayElementAtIndex(list.index);
-			var componentBundle = element.objectReferenceValue as ComponentDatabase;
-			var recipe = (EntityRecipe)target;
-
-			if (componentBundle && IsNestedInAsset(componentBundle, recipe))
+			var bundle = element.objectReferenceValue as ComponentDatabase;
+			if (bundle && IsNestedInAsset(bundle, (EntityRecipe)target))
 			{
-				Undo.DestroyObjectImmediate(componentBundle);
+				ClearPendingDeletion(bundle);
+				Undo.DestroyObjectImmediate(bundle);
 			}
 
 			ReorderableList.defaultBehaviours.DoRemoveButton(list);
@@ -225,15 +224,15 @@ namespace Depra.Ecs.Hybrid.Editor
 
 			for (var index = 0; index < bundles.Count; index++)
 			{
-				var componentBundle = bundles[index];
-				if (!componentBundle || IsNestedInAsset(componentBundle, recipe))
+				var bundle = bundles[index];
+				if (!bundle || IsNestedInAsset(bundle, recipe))
 				{
 					continue;
 				}
 
-				var newNested = CreateNestedCopy(recipe, componentBundle);
+				var newNested = CreateNestedCopy(recipe, bundle);
 				_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
-				SavePendingDeletion(newNested, componentBundle);
+				SavePendingDeletion(newNested, bundle);
 				convertedCount++;
 			}
 
@@ -311,13 +310,14 @@ namespace Depra.Ecs.Hybrid.Editor
 
 			for (var index = 0; index < bundles.Count; index++)
 			{
-				var componentBundle = bundles[index];
-				if (!componentBundle || !IsNestedInAsset(componentBundle, recipe))
+				var nested = bundles[index];
+				if (!nested || !IsNestedInAsset(nested, recipe))
 				{
 					continue;
 				}
 
-				var extracted = ExtractToNewAsset(componentBundle, directory);
+				ClearPendingDeletion(nested);
+				var extracted = ExtractToNewAsset(nested, directory);
 				_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = extracted;
 				extractedCount++;
 			}
@@ -336,6 +336,7 @@ namespace Depra.Ecs.Hybrid.Editor
 				return;
 			}
 
+			ClearPendingDeletion(nested);
 			var recipePath = AssetDatabase.GetAssetPath(recipe);
 			var directory = Path.GetDirectoryName(recipePath);
 			Undo.RecordObject(recipe, $"Extract Nested: {nested.name}");
@@ -362,43 +363,29 @@ namespace Depra.Ecs.Hybrid.Editor
 		private static void DrawBundlesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Bundles");
 		private static void DrawSourcesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Sources");
 
-		private static string GetSessionStateKey(string nestedGuid) => $"EntityRecipe_PendingDeletion_{nestedGuid}";
+		private static string GetSessionStateKey(ComponentDatabase nested)
+		{
+			var globalId = GlobalObjectId.GetGlobalObjectIdSlow(nested);
+			return $"EntityRecipe_PendingDeletion_{globalId}";
+		}
 
 		private static void SavePendingDeletion(ComponentDatabase nested, ComponentDatabase original)
 		{
-			if (!nested || !original)
+			if (nested && original)
 			{
-				return;
+				SessionState.SetString(GetSessionStateKey(nested), AssetDatabase.GetAssetPath(original));
 			}
-
-			var nestedPath = AssetDatabase.GetAssetPath(nested);
-			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
-			var originalPath = AssetDatabase.GetAssetPath(original);
-			SessionState.SetString(GetSessionStateKey(nestedGuid), originalPath);
 		}
 
-		private static string GetPendingDeletionPath(ComponentDatabase nested)
-		{
-			if (nested == null)
-			{
-				return null;
-			}
-
-			var nestedPath = AssetDatabase.GetAssetPath(nested);
-			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
-			return SessionState.GetString(GetSessionStateKey(nestedGuid), null);
-		}
+		private static string GetPendingDeletionPath(ComponentDatabase nested) => 
+			nested ? SessionState.GetString(GetSessionStateKey(nested), null) : null;
 
 		private static void ClearPendingDeletion(ComponentDatabase nested)
 		{
-			if (nested == null)
+			if (nested)
 			{
-				return;
+				SessionState.EraseString(GetSessionStateKey(nested));
 			}
-
-			var nestedPath = AssetDatabase.GetAssetPath(nested);
-			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
-			SessionState.EraseString(GetSessionStateKey(nestedGuid));
 		}
 	}
 }
