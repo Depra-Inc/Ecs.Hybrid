@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using Depra.Ecs.QoL;
 #if ENABLE_IL2CPP
@@ -14,14 +14,15 @@ namespace Depra.Ecs.Hybrid
 #endif
 	public sealed class ContinuousEntityBakingSystem : IPreInitializationSystem, IExecutionSystem
 	{
-		private IEntityQuery _entities;
+		private EntityQuery _entities;
 		private ComponentPool<BakingEntityRef> _bakingEntities;
 
 		void IPreInitializationSystem.PreInitialize(IWorldGroup worlds)
 		{
 			var world = worlds.Default;
+			_entities = new EntityQuery(typeof(BakingEntityRef));
+			_entities.Initialize(world);
 			_bakingEntities = world.Pool<BakingEntityRef>();
-			_entities = new EntityQuery(typeof(BakingEntityRef)).Initialize(world);
 		}
 
 		void IExecutionSystem.Execute()

@@ -14,9 +14,6 @@ namespace Depra.Ecs.Hybrid.Editor
 	[CustomEditor(typeof(EntityRecipe))]
 	internal sealed class EntityRecipeEditor : UnityEditor.Editor
 	{
-		private static void DrawBundlesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Bundles");
-		private static void DrawSourcesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Sources");
-
 		private ReorderableList _componentBundles;
 		private SerializedProperty _componentBundlesProperty;
 		private ReorderableList _componentSources;
@@ -38,15 +35,14 @@ namespace Depra.Ecs.Hybrid.Editor
 			_componentSources = new ReorderableList(serializedObject, _componentSourcesProperty, true, true, true, true)
 			{
 				drawHeaderCallback = DrawSourcesHeader,
-				drawElementCallback = DrawSourceElement
+				drawElementCallback = DrawSourceElement,
 			};
 		}
 
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
-			var recipe = (EntityRecipe)target;
-			DrawControlButtons(recipe);
+			DrawControlButtons((EntityRecipe)target);
 			EditorGUILayout.Space(5);
 			_componentBundles.DoLayoutList();
 			_componentSources.DoLayoutList();
@@ -142,12 +138,26 @@ namespace Depra.Ecs.Hybrid.Editor
 			if (componentBundle)
 			{
 				var actionRect = new Rect(rect.x + rect.width - 45, rect.y, 45, rect.height);
+				var pendingOriginalPath = isNested ? GetPendingDeletionPath(componentBundle) : null;
+				var hasPendingOriginal = !string.IsNullOrEmpty(pendingOriginalPath);
+
 				if (!isNested)
 				{
 					if (GUI.Button(actionRect, "Nest"))
 					{
 						MakeNested(recipe, index);
 					}
+				}
+				else if (hasPendingOriginal)
+				{
+					var originalColor = GUI.backgroundColor;
+					GUI.backgroundColor = new Color(1f, 0.3f, 0.3f);
+					if (GUI.Button(actionRect, "Del"))
+					{
+						DeleteOriginal(componentBundle, pendingOriginalPath);
+					}
+
+					GUI.backgroundColor = originalColor;
 				}
 				else
 				{
@@ -172,15 +182,9 @@ namespace Depra.Ecs.Hybrid.Editor
 			var componentBundle = element.objectReferenceValue as ComponentDatabase;
 			var recipe = (EntityRecipe)target;
 
-			Undo.RecordObject(recipe, "Remove Set");
-
-			if (componentBundle)
+			if (componentBundle && IsNestedInAsset(componentBundle, recipe))
 			{
-				recipe.Remove(componentBundle);
-				if (IsNestedInAsset(componentBundle, recipe))
-				{
-					Undo.DestroyObjectImmediate(componentBundle);
-				}
+				Undo.DestroyObjectImmediate(componentBundle);
 			}
 
 			ReorderableList.defaultBehaviours.DoRemoveButton(list);
@@ -229,6 +233,7 @@ namespace Depra.Ecs.Hybrid.Editor
 
 				var newNested = CreateNestedCopy(recipe, componentBundle);
 				_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
+				SavePendingDeletion(newNested, componentBundle);
 				convertedCount++;
 			}
 
@@ -249,10 +254,43 @@ namespace Depra.Ecs.Hybrid.Editor
 			Undo.RecordObject(recipe, $"Make Nested: {original.name}");
 			var newNested = CreateNestedCopy(recipe, original);
 			_componentBundlesProperty.GetArrayElementAtIndex(index).objectReferenceValue = newNested;
-
+			SavePendingDeletion(newNested, original);
 			serializedObject.ApplyModifiedProperties();
 			EditorUtility.SetDirty(recipe);
 			AssetDatabase.SaveAssets();
+		}
+
+		private static void DeleteOriginal(ComponentDatabase nested, string originalPath)
+		{
+			if (nested == null || string.IsNullOrEmpty(originalPath))
+			{
+				return;
+			}
+
+			if (!File.Exists(originalPath))
+			{
+				ClearPendingDeletion(nested);
+				Debug.LogWarning($"Original file no longer exists: {originalPath}");
+				return;
+			}
+
+			if (EditorUtility.DisplayDialog(
+				    "Delete Original File",
+				    $"Delete original file?\n\n{originalPath}\n\nThis cannot be undone!",
+				    "Delete",
+				    "Cancel"))
+			{
+				if (AssetDatabase.DeleteAsset(originalPath))
+				{
+					ClearPendingDeletion(nested);
+					AssetDatabase.SaveAssets();
+					Debug.Log($"Deleted original file: {originalPath}");
+				}
+				else
+				{
+					Debug.LogError($"Failed to delete: {originalPath}");
+				}
+			}
 		}
 
 		private static ComponentDatabase CreateNestedCopy(EntityRecipe recipe, ComponentDatabase original)
@@ -319,6 +357,48 @@ namespace Depra.Ecs.Hybrid.Editor
 			Undo.DestroyObjectImmediate(nested);
 
 			return copy;
+		}
+
+		private static void DrawBundlesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Bundles");
+		private static void DrawSourcesHeader(Rect rect) => EditorGUI.LabelField(rect, "Component Sources");
+
+		private static string GetSessionStateKey(string nestedGuid) => $"EntityRecipe_PendingDeletion_{nestedGuid}";
+
+		private static void SavePendingDeletion(ComponentDatabase nested, ComponentDatabase original)
+		{
+			if (!nested || !original)
+			{
+				return;
+			}
+
+			var nestedPath = AssetDatabase.GetAssetPath(nested);
+			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
+			var originalPath = AssetDatabase.GetAssetPath(original);
+			SessionState.SetString(GetSessionStateKey(nestedGuid), originalPath);
+		}
+
+		private static string GetPendingDeletionPath(ComponentDatabase nested)
+		{
+			if (nested == null)
+			{
+				return null;
+			}
+
+			var nestedPath = AssetDatabase.GetAssetPath(nested);
+			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
+			return SessionState.GetString(GetSessionStateKey(nestedGuid), null);
+		}
+
+		private static void ClearPendingDeletion(ComponentDatabase nested)
+		{
+			if (nested == null)
+			{
+				return;
+			}
+
+			var nestedPath = AssetDatabase.GetAssetPath(nested);
+			var nestedGuid = AssetDatabase.AssetPathToGUID(nestedPath);
+			SessionState.EraseString(GetSessionStateKey(nestedGuid));
 		}
 	}
 }
