@@ -26,7 +26,7 @@ namespace Depra.Ecs.Hybrid
 		[SerializeField] internal DestructionMode _destructionMode;
 
 		private bool _processed;
-		private PackedEntityWithWorld _entity;
+		private PackedEntityWithWorld _entity = PackedEntityWithWorld.NULL;
 
 		private void OnEnable()
 		{
@@ -47,15 +47,9 @@ namespace Depra.Ecs.Hybrid
 		IBaker IAuthoring.CreateBaker() => new Backer(this);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void Initialize(PackedEntityWithWorld entity)
-		{
-			_entity = entity;
-			_processed = true;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void FinalizeConversion()
 		{
+			_processed = true;
 			switch (_destructionMode)
 			{
 				case DestructionMode.NONE:
@@ -75,8 +69,29 @@ namespace Depra.Ecs.Hybrid
 		[Il2CppSetOption(Option.NullChecks, false)]
 		[Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 #endif
-		private readonly struct Backer : IBaker
+		internal readonly struct Backer : IBaker
 		{
+			public static void Bake(AuthoringEntity component, World world, Entity entity)
+			{
+				if (component._processed)
+				{
+					return;
+				}
+
+				component._entity = world.PackEntityWithWorld(entity);
+				using var access = component.GetNested();
+				foreach (var element in access.Enumerate())
+				{
+					element.CreateBaker().Bake(component, world);
+					if (component._destructionMode == DestructionMode.DESTROY_COMPONENT)
+					{
+						Destroy((Component)element);
+					}
+				}
+
+				component.FinalizeConversion();
+			}
+
 			private readonly AuthoringEntity _component;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,26 +100,10 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (_component._processed)
+				if (!_component._processed)
 				{
-					return;
+					Bake(_component, world, world.CreateEntity());
 				}
-
-				var entity = world.CreateEntity();
-				var packedEntity = world.PackEntityWithWorld(entity);
-				_component.Initialize(packedEntity);
-
-				using var access = _component.GetNested();
-				foreach (var element in access.Enumerate())
-				{
-					element.CreateBaker().Bake(_component, world);
-					if (_component._destructionMode == DestructionMode.DESTROY_COMPONENT)
-					{
-						Destroy((Component)element);
-					}
-				}
-
-				_component.FinalizeConversion();
 			}
 		}
 
