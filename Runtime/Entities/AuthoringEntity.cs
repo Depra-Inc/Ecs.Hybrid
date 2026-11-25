@@ -30,7 +30,7 @@ namespace Depra.Ecs.Hybrid
 
 		private void OnEnable()
 		{
-			if (!UnityWorlds.Connected || _processed)
+			if (!UnityWorlds.Connected || IsBaked)
 			{
 				return;
 			}
@@ -39,6 +39,8 @@ namespace Depra.Ecs.Hybrid
 			var entity = world.CreateEntity();
 			world.Pool<BakingEntityRef>().Allocate(entity).Value = gameObject;
 		}
+
+		private bool IsBaked => _processed && _entity.Unpack(out _, out _);
 
 		public NestedAccess GetNested() => new(this);
 
@@ -73,7 +75,7 @@ namespace Depra.Ecs.Hybrid
 		{
 			public static void Bake(AuthoringEntity component, World world, Entity entity)
 			{
-				if (component._processed)
+				if (component.IsBaked)
 				{
 					return;
 				}
@@ -100,7 +102,7 @@ namespace Depra.Ecs.Hybrid
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			void IBaker.Bake(IAuthoring authoring, World world)
 			{
-				if (!_component._processed)
+				if (!_component.IsBaked)
 				{
 					Bake(_component, world, world.CreateEntity());
 				}
